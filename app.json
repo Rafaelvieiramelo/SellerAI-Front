@@ -30,7 +30,13 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permita que o SellerAI acesse imagens para criar previews dos seus anúncios."
+        }
+      ]
     ]
   }
 }

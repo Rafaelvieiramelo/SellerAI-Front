@@ -1,10 +1,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Platform, StyleSheet, View } from 'react-native';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import { useAuth } from '../contexts/AuthContext';
-import { View, Text } from 'react-native';
+import ProductAdGeneratorScreen from '../features/product-ad-generator/screens/ProductAdGeneratorScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -14,32 +15,46 @@ export type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-// tela temporária até criar o dashboard
-function HomeScreen() {
-  const { user, logout } = useAuth();
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' }}>
-      <Text style={{ color: '#fff', fontSize: 20 }}>Bem-vindo, {user?.name}!</Text>
-      <Text style={{ color: '#3b82f6', marginTop: 20 }} onPress={logout}>Sair</Text>
-    </View>
-  );
-}
-
 export default function AppNavigator() {
   const { token } = useAuth();
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {token ? (
-          <Stack.Screen name="Home" component={HomeScreen} />
-        ) : (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.navigationRoot}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            cardStyle: styles.card,
+          }}
+        >
+          {token ? (
+            <Stack.Screen name="Home" component={ProductAdGeneratorScreen} />
+          ) : (
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Register" component={RegisterScreen} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  navigationRoot: {
+    flex: 1,
+    minHeight: 0,
+    ...Platform.select({
+      web: {
+        minHeight: '100%',
+        backgroundColor: '#07111f',
+      },
+      default: null,
+    }),
+  },
+  card: {
+    flex: 1,
+    backgroundColor: '#07111f',
+  },
+});
