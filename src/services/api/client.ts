@@ -8,7 +8,7 @@ const getBaseUrl = () => {
   }
 
   if (Platform.OS === 'web') {
-    return 'http://localhost:8080';
+    return 'https://localhost:7252';
   }
 
   return 'http://192.168.1.8:8080';
@@ -30,7 +30,7 @@ apiClient.interceptors.request.use(async (config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  console.log('[API] Request:', config.method?.toUpperCase(), config.baseURL + config.url);
+  console.log('[API] Request:', config.method?.toUpperCase(), `${config.baseURL ?? ''}${config.url ?? ''}`);
   return config;
 });
 

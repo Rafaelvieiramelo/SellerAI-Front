@@ -1,6 +1,7 @@
 import { apiClient } from './api/client';
 import {
   CreateProductRequest,
+  GenerateProductAdResponse,
   Product,
   ProductListParams,
   ProductListResult,
@@ -73,5 +74,13 @@ export const ProductService = {
 
   async remove(id: string): Promise<void> {
     await apiClient.delete(`/api/products/${id}`);
+  },
+
+  async generateAd(productIds: string[]): Promise<GenerateProductAdResponse> {
+    const response = await apiClient.post<GenerateProductAdResponse>('/api/anuncios/gerar', {
+      ids: productIds,
+    });
+
+    return response.data;
   },
 };

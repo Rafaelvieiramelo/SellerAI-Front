@@ -181,8 +181,7 @@ export function ProductForm({
 
       <Pressable onPress={onSubmit} disabled={loading} style={({ pressed }) => [styles.submit, pressed && styles.submitPressed]}>
         <LinearGradient colors={['#0ea5e9', '#2563eb']} style={styles.submitGradient}>
-          <Text style={styles.submitIcon}>OK</Text>
-          <Text style={styles.submitText}>{loading ? 'Gerando anúncio...' : 'Gerar anúncio com IA'}</Text>
+          <Text style={styles.submitText}>{loading ? 'Salvando produto...' : submitLabel ?? 'Salvar Produto'}</Text>
         </LinearGradient>
       </Pressable>
 

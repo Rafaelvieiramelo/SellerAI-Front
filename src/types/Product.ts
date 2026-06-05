@@ -9,6 +9,12 @@ export interface Product {
   targetAudience: string | null;
   price: number;
   tone: string | null;
+  generatedTitulo?: string;
+  generatedDescricao?: string;
+  generatedTags?: string[];
+  generatedCaracteristicasDestaque?: string[];
+  generatedCta?: string;
+  isGeneratedByAI?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -39,6 +45,12 @@ export interface CreateProductRequest {
 export interface UpdateProductRequest extends CreateProductRequest {
   id: string;
 }
+
+export interface GenerateProductAdRequest {
+  ids: string[];
+}
+
+export type GenerateProductAdResponse = Product[] | Product | Record<string, unknown> | null;
 
 export const productFormToCreateRequest = (data: ProductAdFormData): CreateProductRequest => ({
   name: data.productName.trim(),

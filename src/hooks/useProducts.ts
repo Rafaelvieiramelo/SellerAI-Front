@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ProductService } from '../services/ProductService';
 import { getApiErrorMessage } from '../services/api/client';
-import { CreateProductRequest, Product, ProductListResult, UpdateProductRequest } from '../types/Product';
+import {
+  CreateProductRequest,
+  GenerateProductAdResponse,
+  Product,
+  ProductListResult,
+  UpdateProductRequest,
+} from '../types/Product';
 
 const initialList: ProductListResult = {
   items: [],
@@ -15,6 +21,7 @@ export function useProducts(pageSize = 10) {
   const [totalPages, setTotalPages] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generatingAd, setGeneratingAd] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,6 +107,25 @@ export function useProducts(pageSize = 10) {
     [loadProducts, pageNumber],
   );
 
+  const generateAd = useCallback(
+    async (productIds: string[]): Promise<GenerateProductAdResponse> => {
+      setGeneratingAd(true);
+      setError(null);
+
+      try {
+        const response = await ProductService.generateAd(productIds);
+        await loadProducts(pageNumber);
+        return response;
+      } catch (err) {
+        const message = getApiErrorMessage(err);
+        throw new Error(message);
+      } finally {
+        setGeneratingAd(false);
+      }
+    },
+    [loadProducts, pageNumber],
+  );
+
   useEffect(() => {
     void loadProducts(1);
   }, []);
@@ -111,11 +137,13 @@ export function useProducts(pageSize = 10) {
     totalPages,
     loading,
     saving,
+    generatingAd,
     deletingId,
     error,
     loadProducts,
     createProduct,
     updateProduct,
     deleteProduct,
+    generateAd,
   };
 }
