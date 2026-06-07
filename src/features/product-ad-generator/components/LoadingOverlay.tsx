@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Modal, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { spacing } from '../../../theme/spacing';
+import { radii } from '../../../theme/radii';
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -28,7 +32,7 @@ export function LoadingOverlay({ visible }: LoadingOverlayProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.backdrop}>
-        <LinearGradient colors={['#0f172a', '#111827']} style={styles.card}>
+        <LinearGradient colors={[colors.bgInput, colors.bgSurface]} style={styles.card}>
           <Animated.View style={[styles.orbit, { opacity: pulse, transform: [{ scale: pulse }] }]}>
             <Text style={styles.orbitText}>AI</Text>
           </Animated.View>
@@ -48,56 +52,56 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(2, 6, 23, 0.78)',
-    padding: 24,
+    backgroundColor: colors.bgOverlay,
+    padding: spacing[6],
   },
   card: {
     width: '100%',
     maxWidth: 360,
     alignItems: 'center',
-    borderRadius: 28,
+    borderRadius: radii['2xl'] + 4,
     borderWidth: 1,
-    borderColor: '#243449',
-    padding: 28,
+    borderColor: colors.borderDefault,
+    padding: spacing[6] + 4,
   },
   orbit: {
     width: 72,
     height: 72,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 24,
-    backgroundColor: '#0ea5e9',
-    marginBottom: 18,
+    borderRadius: radii.xl,
+    backgroundColor: colors.brandPrimary,
+    marginBottom: spacing[4] + 2,
   },
   orbitText: {
-    color: '#ffffff',
+    color: colors.white,
     fontWeight: '900',
     fontSize: 22,
   },
   title: {
-    color: '#ffffff',
-    fontSize: 20,
+    ...typography.h2,
+    color: colors.textPrimary,
     fontWeight: '900',
   },
   subtitle: {
-    color: '#94a3b8',
-    fontSize: 13,
+    ...typography.bodySm,
+    color: colors.textTertiary,
     lineHeight: 20,
-    marginTop: 8,
+    marginTop: spacing[2],
     textAlign: 'center',
   },
   progressTrack: {
     width: '100%',
     height: 8,
-    borderRadius: 999,
-    backgroundColor: '#1e293b',
-    marginTop: 22,
+    borderRadius: radii.full,
+    backgroundColor: colors.bgSurfaceActive,
+    marginTop: spacing[5] + 2,
     overflow: 'hidden',
   },
   progressFill: {
     width: '74%',
     height: '100%',
-    borderRadius: 999,
-    backgroundColor: '#38bdf8',
+    borderRadius: radii.full,
+    backgroundColor: colors.brandText,
   },
 });

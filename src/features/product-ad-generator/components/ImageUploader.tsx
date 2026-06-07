@@ -1,6 +1,10 @@
 import React from 'react';
 import { Alert, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { spacing } from '../../../theme/spacing';
+import { radii } from '../../../theme/radii';
 
 interface ImageUploaderProps {
   value?: string;
@@ -58,9 +62,9 @@ const styles = StyleSheet.create({
   upload: {
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: '#38bdf8',
-    borderRadius: 22,
-    backgroundColor: '#0d1b2c',
+    borderColor: colors.brandText,
+    borderRadius: radii['2xl'] + 2,
+    backgroundColor: colors.bgSurface,
     overflow: 'hidden',
   },
   uploadPressed: {
@@ -71,69 +75,70 @@ const styles = StyleSheet.create({
     minHeight: 180,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 22,
+    padding: spacing[5] + 2,
   },
   iconBox: {
     width: 58,
     height: 58,
-    borderRadius: 18,
+    borderRadius: radii.xl + 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#12385a',
+    backgroundColor: colors.brandSubtle,
     borderWidth: 1,
-    borderColor: '#1d9bf0',
-    marginBottom: 14,
+    borderColor: colors.brandPrimary,
+    marginBottom: spacing[3] + 2,
   },
   iconText: {
-    color: '#bfdbfe',
+    color: colors.brandText,
     fontWeight: '900',
     fontSize: 13,
   },
   title: {
-    color: '#f8fafc',
-    fontSize: 16,
+    ...typography.bodyLg,
+    color: colors.textPrimary,
     fontWeight: '900',
     textAlign: 'center',
   },
   subtitle: {
-    color: '#94a3b8',
-    fontSize: 13,
+    ...typography.bodySm,
+    color: colors.textTertiary,
     lineHeight: 19,
-    marginTop: 6,
+    marginTop: spacing[1],
     textAlign: 'center',
   },
   previewShell: {
-    padding: 12,
+    padding: spacing[3],
   },
   preview: {
     width: '100%',
     height: 220,
-    borderRadius: 16,
-    backgroundColor: '#111827',
+    borderRadius: radii['2xl'],
+    backgroundColor: colors.bgSurface,
   },
   removeButton: {
     position: 'absolute',
-    right: 22,
-    top: 22,
-    borderRadius: 999,
-    backgroundColor: 'rgba(15, 23, 42, 0.82)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    right: spacing[5] + 2,
+    top: spacing[5] + 2,
+    borderRadius: radii.full,
+    backgroundColor: colors.bgOverlay,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[2],
   },
   removeButtonText: {
-    color: '#f8fafc',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.textPrimary,
     fontWeight: '900',
   },
   aiNote: {
     borderTopWidth: 1,
-    borderTopColor: '#17324d',
-    padding: 14,
-    backgroundColor: 'rgba(14, 165, 233, 0.08)',
+    borderTopColor: colors.borderDefault,
+    padding: spacing[3] + 2,
+    backgroundColor: colors.brandSubtle,
+    opacity: 0.6,
   },
   aiNoteText: {
-    color: '#7dd3fc',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.brandText,
     fontWeight: '700',
     textAlign: 'center',
   },

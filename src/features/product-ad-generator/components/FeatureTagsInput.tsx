@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { LayoutAnimation, Platform, Pressable, StyleSheet, Text, TextInput, UIManager, View } from 'react-native';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { spacing } from '../../../theme/spacing';
+import { radii } from '../../../theme/radii';
 
 interface FeatureTagsInputProps {
   value: string[];
@@ -53,7 +57,7 @@ export function FeatureTagsInput({ value, onChange, error }: FeatureTagsInputPro
             onSubmitEditing={addFeature}
             blurOnSubmit={false}
             placeholder={value.length ? 'Adicionar outra...' : 'Digite e pressione Enter. Ex: Bluetooth 5.3'}
-            placeholderTextColor="#718096"
+            placeholderTextColor={colors.textDisabled}
             style={styles.input}
             returnKeyType="done"
           />
@@ -71,42 +75,42 @@ const styles = StyleSheet.create({
   inputShell: {
     minHeight: 70,
     borderWidth: 1,
-    borderColor: '#203044',
-    borderRadius: 18,
-    backgroundColor: '#0f172a',
-    padding: 10,
+    borderColor: colors.borderDefault,
+    borderRadius: radii.xl + 2,
+    backgroundColor: colors.bgInput,
+    padding: spacing[2] + 2,
   },
   inputShellError: {
-    borderColor: '#fb7185',
+    borderColor: colors.error,
   },
   tagsWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing[2],
   },
   tag: {
     minHeight: 36,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    borderRadius: 999,
-    backgroundColor: '#12283f',
+    gap: spacing[2],
+    borderRadius: radii.full,
+    backgroundColor: colors.brandSubtle,
     borderWidth: 1,
-    borderColor: '#1d9bf0',
-    paddingHorizontal: 12,
+    borderColor: colors.brandPrimary,
+    paddingHorizontal: spacing[3],
   },
   tagPressed: {
     transform: [{ scale: 0.97 }],
     opacity: 0.82,
   },
   tagText: {
-    color: '#dbeafe',
-    fontSize: 13,
+    ...typography.bodySm,
+    color: colors.brandText,
     fontWeight: '700',
   },
   removeText: {
-    color: '#93c5fd',
+    color: colors.brandText,
     fontSize: 15,
     fontWeight: '900',
   },
@@ -114,22 +118,22 @@ const styles = StyleSheet.create({
     minWidth: 190,
     flexGrow: 1,
     height: 44,
-    color: '#f8fafc',
+    color: colors.textPrimary,
     fontSize: 15,
     paddingHorizontal: 4,
   },
   helperRow: {
-    gap: 4,
-    marginTop: 8,
+    gap: spacing[1],
+    marginTop: spacing[2],
   },
   helperText: {
-    color: '#64748b',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.textTertiary,
     fontWeight: '600',
   },
   errorText: {
-    color: '#fb7185',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.errorText,
     fontWeight: '700',
   },
 });

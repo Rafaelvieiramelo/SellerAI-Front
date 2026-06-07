@@ -1,6 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { GeneratedProductAd } from '../domain/productAdTypes';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { spacing } from '../../../theme/spacing';
+import { radii } from '../../../theme/radii';
 
 interface SeoPreviewCardProps {
   result: GeneratedProductAd;
@@ -63,66 +67,64 @@ export function SeoPreviewCard({ result }: SeoPreviewCardProps) {
 
 const styles = StyleSheet.create({
   preview: {
-    marginTop: 18,
-    gap: 16,
+    marginTop: spacing[4] + 2,
+    gap: spacing[4],
   },
   previewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 14,
+    gap: spacing[3] + 2,
     alignItems: 'center',
   },
   kicker: {
-    color: '#38bdf8',
-    fontSize: 12,
+    ...typography.overline,
+    color: colors.brandText,
     fontWeight: '900',
-    textTransform: 'uppercase',
   },
   title: {
-    color: '#ffffff',
-    fontSize: 22,
+    ...typography.h1,
+    color: colors.white,
     fontWeight: '900',
-    marginTop: 4,
+    marginTop: spacing[1],
   },
   scoreBadge: {
-    borderRadius: 999,
-    backgroundColor: '#12385a',
+    borderRadius: radii.full,
+    backgroundColor: colors.brandSubtle,
     borderWidth: 1,
-    borderColor: '#38bdf8',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderColor: colors.brandText,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[2],
   },
   scoreBadgeText: {
-    color: '#bae6fd',
+    color: colors.brandText,
     fontWeight: '900',
     fontSize: 13,
   },
   grid: {
-    gap: 12,
+    gap: spacing[3],
   },
   card: {
     borderWidth: 1,
-    borderColor: '#203044',
-    borderRadius: 18,
-    backgroundColor: '#0f172a',
-    padding: 16,
+    borderColor: colors.borderDefault,
+    borderRadius: radii.xl + 2,
+    backgroundColor: colors.bgInput,
+    padding: spacing[4],
   },
   cardLabel: {
-    color: '#7dd3fc',
-    fontSize: 12,
+    ...typography.overline,
+    color: colors.brandText,
     fontWeight: '900',
-    textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: spacing[2],
   },
   cardValue: {
-    color: '#f8fafc',
-    fontSize: 16,
+    ...typography.bodyLg,
+    color: colors.textPrimary,
     lineHeight: 23,
     fontWeight: '800',
   },
   description: {
-    color: '#cbd5e1',
-    fontSize: 14,
+    ...typography.body,
+    color: colors.textSecondary,
     lineHeight: 22,
     fontWeight: '600',
   },
@@ -130,46 +132,46 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: spacing[3],
   },
   scoreText: {
-    color: '#f8fafc',
+    color: colors.textPrimary,
     fontWeight: '900',
   },
   progressTrack: {
     height: 10,
-    borderRadius: 999,
-    backgroundColor: '#1e293b',
+    borderRadius: radii.full,
+    backgroundColor: colors.bgSurfaceActive,
     overflow: 'hidden',
-    marginTop: 4,
+    marginTop: spacing[1],
   },
   progressFill: {
     height: '100%',
-    borderRadius: 999,
-    backgroundColor: '#22c55e',
+    borderRadius: radii.full,
+    backgroundColor: colors.success,
   },
   scoreHint: {
-    color: '#64748b',
-    fontSize: 12,
-    marginTop: 10,
+    ...typography.caption,
+    color: colors.textTertiary,
+    marginTop: spacing[2] + 2,
     lineHeight: 17,
   },
   keywords: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: spacing[2],
   },
   keyword: {
-    borderRadius: 999,
-    backgroundColor: '#172033',
+    borderRadius: radii.full,
+    backgroundColor: colors.bgSurfaceActive,
     borderWidth: 1,
-    borderColor: '#334155',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    borderColor: colors.borderStrong,
+    paddingHorizontal: spacing[2] + 2,
+    paddingVertical: spacing[1],
   },
   keywordText: {
-    color: '#e2e8f0',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.textSecondary,
     fontWeight: '800',
   },
 });

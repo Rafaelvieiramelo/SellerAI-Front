@@ -7,6 +7,11 @@ import { audiences, categories, marketplaces, ProductAdFormData, tones } from '.
 import { FeatureTagsInput } from './FeatureTagsInput';
 import { ImageUploader } from './ImageUploader';
 import { VisualOptionSelector } from './VisualOptionSelector';
+import { colors } from '../../../theme/colors';
+import { typography } from '../../../theme/typography';
+import { spacing } from '../../../theme/spacing';
+import { radii } from '../../../theme/radii';
+import { shadows } from '../../../theme/shadows';
 
 interface ProductFormProps {
   control: Control<ProductAdFormData>;
@@ -46,7 +51,7 @@ export function ProductForm({
                 value={value}
                 onChangeText={onChange}
                 placeholder="Ex: Fone Bluetooth Gamer RGB"
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.textTertiary}
                 style={[styles.input, errors.productName && styles.inputError]}
               />
             </Field>
@@ -108,7 +113,7 @@ export function ProductForm({
                   onChangeText={onChange}
                   keyboardType="decimal-pad"
                   placeholder="0,00"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor={colors.textTertiary}
                   style={[styles.input, errors.costPrice && styles.inputError]}
                 />
               </Field>
@@ -125,7 +130,7 @@ export function ProductForm({
                   onChangeText={onChange}
                   keyboardType="decimal-pad"
                   placeholder="0,00"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor={colors.textTertiary}
                   style={[styles.input, errors.salePrice && styles.inputError]}
                 />
               </Field>
@@ -142,7 +147,7 @@ export function ProductForm({
                   onChangeText={onChange}
                   keyboardType="decimal-pad"
                   placeholder="30"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor={colors.textTertiary}
                   style={styles.input}
                 />
               </Field>
@@ -180,14 +185,14 @@ export function ProductForm({
       </Section>
 
       <Pressable onPress={onSubmit} disabled={loading} style={({ pressed }) => [styles.submit, pressed && styles.submitPressed]}>
-        <LinearGradient colors={['#0ea5e9', '#2563eb']} style={styles.submitGradient}>
+        <LinearGradient colors={[colors.brandPrimary, colors.brandHover]} style={styles.submitGradient}>
           <Text style={styles.submitText}>{loading ? 'Salvando produto...' : submitLabel ?? 'Salvar Produto'}</Text>
         </LinearGradient>
       </Pressable>
 
       {onCancelEdit ? (
         <Pressable onPress={onCancelEdit} disabled={loading} style={({ pressed }) => [styles.cancelButton, pressed && styles.submitPressed]}>
-          <Text style={styles.cancelButtonText}>Cancelar edicao</Text>
+          <Text style={styles.cancelButtonText}>Cancelar edição</Text>
         </Pressable>
       ) : null}
     </View>
@@ -233,142 +238,130 @@ function Field({
 
 const styles = StyleSheet.create({
   form: {
-    gap: 14,
+    gap: spacing[3] + 2,
   },
   section: {
     borderWidth: 1,
-    borderColor: '#1f2d3f',
-    borderRadius: 24,
-    backgroundColor: 'rgba(15, 23, 42, 0.92)',
-    padding: 18,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000000',
-        shadowOpacity: 0.18,
-        shadowRadius: 20,
-        shadowOffset: { width: 0, height: 10 },
-      },
-      android: {
-        elevation: 0,
-      },
-      default: null,
-    }),
+    borderColor: colors.borderDefault,
+    borderRadius: radii['2xl'],
+    backgroundColor: colors.bgSurface,
+    padding: spacing[4] + 2,
+    ...shadows.sm,
   },
   sectionHeader: {
-    marginBottom: 16,
+    marginBottom: spacing[4],
   },
   eyebrow: {
-    color: '#38bdf8',
-    fontSize: 11,
+    ...typography.overline,
+    color: colors.brandText,
     fontWeight: '900',
-    textTransform: 'uppercase',
   },
   sectionTitle: {
-    color: '#f8fafc',
-    fontSize: 19,
+    ...typography.h2,
+    color: colors.textPrimary,
     fontWeight: '900',
-    marginTop: 4,
+    marginTop: spacing[1],
   },
   sectionBody: {
-    gap: 16,
+    gap: spacing[4],
   },
   inlineGrid: {
-    gap: 16,
+    gap: spacing[4],
   },
   priceGrid: {
-    gap: 14,
+    gap: spacing[3] + 2,
   },
   field: {
-    gap: 8,
+    gap: spacing[2],
   },
   labelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing[2],
   },
   labelIcon: {
     width: 24,
     height: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#12283f',
+    borderRadius: radii.lg,
+    backgroundColor: colors.brandSubtle,
     borderWidth: 1,
-    borderColor: '#1d9bf0',
+    borderColor: colors.brandPrimary,
   },
   labelIconText: {
-    color: '#bae6fd',
+    color: colors.brandText,
     fontSize: 11,
     fontWeight: '900',
   },
   label: {
-    color: '#cbd5e1',
-    fontSize: 13,
+    ...typography.bodySm,
+    color: colors.textSecondary,
     fontWeight: '800',
   },
   input: {
     minHeight: 54,
     borderWidth: 1,
-    borderColor: '#203044',
-    borderRadius: 16,
-    backgroundColor: '#0f172a',
-    color: '#f8fafc',
+    borderColor: colors.borderDefault,
+    borderRadius: radii['2xl'],
+    backgroundColor: colors.bgInput,
+    color: colors.textPrimary,
     fontSize: 15,
     fontWeight: '700',
-    paddingHorizontal: 14,
+    paddingHorizontal: spacing[4],
   },
   inputError: {
-    borderColor: '#fb7185',
+    borderColor: colors.error,
   },
   errorText: {
-    color: '#fb7185',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.errorText,
     fontWeight: '700',
   },
   marginPanel: {
     minHeight: 72,
-    borderRadius: 18,
+    borderRadius: radii.xl + 2,
     borderWidth: 1,
-    borderColor: '#22364d',
-    backgroundColor: '#0d1b2c',
-    padding: 14,
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgSurface,
+    padding: spacing[3] + 2,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: spacing[3],
   },
   marginLabel: {
-    color: '#f8fafc',
-    fontSize: 14,
+    ...typography.body,
+    color: colors.textPrimary,
     fontWeight: '900',
   },
   marginHint: {
-    color: '#64748b',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.textTertiary,
     marginTop: 3,
     fontWeight: '600',
   },
   marginBadge: {
     minWidth: 64,
     alignItems: 'center',
-    borderRadius: 999,
-    backgroundColor: '#3f1d2a',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderRadius: radii.full,
+    backgroundColor: colors.errorSubtle,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[2],
   },
   marginBadgeGood: {
-    backgroundColor: '#123524',
+    backgroundColor: colors.successSubtle,
   },
   marginBadgeText: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 15,
     fontWeight: '900',
   },
   submit: {
-    borderRadius: 20,
+    borderRadius: radii['2xl'],
     overflow: 'hidden',
-    marginTop: 4,
-    marginBottom: 16,
+    marginTop: spacing[1],
+    marginBottom: spacing[4],
   },
   submitPressed: {
     transform: [{ scale: 0.99 }],
@@ -379,17 +372,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 18,
-  },
-  submitIcon: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '900',
+    gap: spacing[2] + 2,
+    paddingHorizontal: spacing[4] + 2,
   },
   submitText: {
-    color: '#ffffff',
-    fontSize: 17,
+    color: colors.white,
+    ...typography.h3,
     fontWeight: '900',
   },
   cancelButton: {
@@ -397,14 +385,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 18,
-    marginTop: -8,
-    marginBottom: 16,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.xl + 2,
+    marginTop: -spacing[2],
+    marginBottom: spacing[4],
   },
   cancelButtonText: {
-    color: '#cbd5e1',
-    fontSize: 14,
+    ...typography.body,
+    color: colors.textSecondary,
     fontWeight: '900',
   },
 });
