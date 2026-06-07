@@ -2,10 +2,11 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Platform, StyleSheet, View } from 'react-native';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import { useAuth } from '../contexts/AuthContext';
+import LoginScreen from '../features/auth/presentation/screens/LoginScreen';
+import RegisterScreen from '../features/auth/presentation/screens/RegisterScreen';
+import { useAuth } from '../features/auth/presentation/contexts/AuthContext';
 import ProductAdGeneratorScreen from '../features/product-ad-generator/screens/ProductAdGeneratorScreen';
+import { colors } from '../theme/colors';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -48,13 +49,13 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         minHeight: '100%',
-        backgroundColor: '#07111f',
+        backgroundColor: colors.bgPrimary,
       },
       default: null,
     }),
   },
   card: {
     flex: 1,
-    backgroundColor: '#07111f',
+    backgroundColor: colors.bgPrimary,
   },
 });
