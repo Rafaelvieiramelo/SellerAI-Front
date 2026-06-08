@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView,
@@ -31,6 +31,7 @@ export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const passwordInputRef = useRef<TextInput>(null);
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -89,6 +90,9 @@ export default function LoginScreen() {
                   autoCapitalize="none"
                   value={value}
                   onChangeText={onChange}
+                  returnKeyType="next"
+                  onSubmitEditing={() => passwordInputRef.current?.focus()}
+                  blurOnSubmit={false}
                 />
                 {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
               </View>
@@ -102,12 +106,15 @@ export default function LoginScreen() {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Senha</Text>
                 <TextInput
+                  ref={passwordInputRef}
                   style={[styles.input, errors.password && styles.inputError]}
                   placeholder="••••••••"
                   placeholderTextColor={colors.textTertiary}
                   secureTextEntry
                   value={value}
                   onChangeText={onChange}
+                  returnKeyType="done"
+                  onSubmitEditing={handleSubmit(onSubmit)}
                 />
                 {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
               </View>
