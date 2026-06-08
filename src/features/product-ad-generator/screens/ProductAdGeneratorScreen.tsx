@@ -416,16 +416,16 @@ function GeneratedAdDetails({ product }: { product: Product }) {
     <View style={styles.generatedDetails}>
       <View style={styles.generatedHeader}>
         <Text style={styles.generatedBadge}>IA</Text>
-        <Text style={styles.generatedHeading}>Anuncio gerado</Text>
+        <Text style={styles.generatedHeading}>Anúncio Gerado por Inteligência Artificial</Text>
       </View>
 
-      {generated.titulo ? <GeneratedField label="Titulo" value={generated.titulo} /> : null}
-      {generated.descricao ? <GeneratedField label="Descricao" value={generated.descricao} /> : null}
-      {generated.cta ? <GeneratedField label="CTA" value={generated.cta} /> : null}
+      {generated.titulo ? <GeneratedField label="Título Sugerido" value={generated.titulo} /> : null}
+      {generated.descricao ? <GeneratedField label="Descrição Sugerida" value={generated.descricao} /> : null}
+      {generated.cta ? <GeneratedField label="Chamada para Ação (CTA)" value={generated.cta} /> : null}
 
-      {generated.tags.length ? <GeneratedChips label="Tags" values={generated.tags} /> : null}
+      {generated.tags.length ? <GeneratedChips label="Tags Sugeridas" values={generated.tags} /> : null}
       {generated.caracteristicasDestaque.length ? (
-        <GeneratedChips label="Destaques" values={generated.caracteristicasDestaque} />
+        <GeneratedChips label="Destaques Recomendados" values={generated.caracteristicasDestaque} />
       ) : null}
 
       {generated.createdAt ? <Text style={styles.generatedDate}>Criado em {formatDate(generated.createdAt)}</Text> : null}
