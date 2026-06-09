@@ -8,3 +8,19 @@ export { Divider } from './Divider';
 export { Skeleton, SkeletonCard, SkeletonTable } from './Skeleton';
 export { Tabs } from './Tabs';
 export { Spinner } from './Spinner';
+
+// Design System v2 Exports
+export {
+  PrimaryButton,
+  SecondaryButton,
+  AIButton,
+  StatsCard,
+  ProductCard,
+  MarketplaceBadge,
+  SearchBar,
+  FilterSelect,
+  EmptyState,
+  LoadingState,
+  PageHeader
+} from './DesignSystem';
+

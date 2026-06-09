@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Controller, Control, FieldErrors } from 'react-hook-form';
 import { Pressable, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,6 +12,125 @@ import { typography } from '../../../theme/typography';
 import { spacing } from '../../../theme/spacing';
 import { radii } from '../../../theme/radii';
 import { shadows } from '../../../theme/shadows';
+
+interface CategorySelectProps {
+  value: string;
+  onChange: (val: string) => void;
+  options: readonly string[];
+}
+
+function CategorySelect({ value, onChange, options }: CategorySelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.dropdownContainer}>
+        <select
+          value={value}
+          onChange={(e: any) => onChange(e.target.value)}
+          style={{
+            width: '100%',
+            height: 54,
+            borderWidth: 1,
+            borderColor: colors.borderDefault,
+            borderRadius: 16,
+            backgroundColor: colors.bgInput,
+            color: colors.textPrimary,
+            fontSize: 15,
+            fontWeight: '700',
+            paddingHorizontal: 16,
+            appearance: 'none',
+            borderStyle: 'solid',
+            outline: 'none',
+            fontFamily: 'inherit',
+          } as any}
+        >
+          {options.map((opt) => (
+            <option key={opt} value={opt} style={{ backgroundColor: colors.bgSurface, color: colors.textPrimary } as any}>
+              {opt}
+            </option>
+          ))}
+        </select>
+        <Text style={styles.dropdownArrowWeb}>▼</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.dropdownWrapper}>
+      <Pressable
+        onPress={() => setIsOpen(!isOpen)}
+        style={styles.dropdownTrigger}
+      >
+        <Text style={styles.dropdownTriggerText}>{value}</Text>
+        <Text style={styles.dropdownArrow}>▼</Text>
+      </Pressable>
+      {isOpen && (
+        <View style={styles.dropdownOptionsList}>
+          {options.map((opt) => (
+            <Pressable
+              key={opt}
+              onPress={() => {
+                onChange(opt);
+                setIsOpen(false);
+              }}
+              style={({ pressed }) => [
+                styles.dropdownOption,
+                opt === value && styles.dropdownOptionSelected,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.dropdownOptionText,
+                  opt === value && styles.dropdownOptionTextSelected,
+                ]}
+              >
+                {opt}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+interface MarketplaceSelectorProps {
+  value: string;
+  onChange: (val: any) => void;
+  options: readonly string[];
+}
+
+function MarketplaceSelector({ value, onChange, options }: MarketplaceSelectorProps) {
+  return (
+    <View style={styles.marketplaceSelectorRow}>
+      {options.map((opt) => {
+        const isSelected = value === opt;
+        return (
+          <Pressable
+            key={opt}
+            onPress={() => onChange(opt)}
+            style={({ pressed }) => [
+              styles.marketplaceBtn,
+              isSelected ? styles.marketplaceBtnSelected : styles.marketplaceBtnUnselected,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text
+              style={[
+                styles.marketplaceBtnText,
+                isSelected ? styles.marketplaceBtnTextSelected : styles.marketplaceBtnTextUnselected,
+              ]}
+            >
+              {opt}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
 
 interface ProductFormProps {
   control: Control<ProductAdFormData>;
@@ -64,7 +183,7 @@ export function ProductForm({
             name="category"
             render={({ field: { onChange, value } }) => (
               <Field label="Categoria" icon="C">
-                <VisualOptionSelector options={categories} value={value} onChange={onChange} compact />
+                <CategorySelect options={categories} value={value} onChange={onChange} />
               </Field>
             )}
           />
@@ -74,7 +193,7 @@ export function ProductForm({
             name="marketplace"
             render={({ field: { onChange, value } }) => (
               <Field label="Marketplace" icon="M">
-                <VisualOptionSelector options={marketplaces} value={value} onChange={onChange} compact />
+                <MarketplaceSelector options={marketplaces} value={value} onChange={onChange} />
               </Field>
             )}
           />
@@ -238,14 +357,14 @@ function Field({
 
 const styles = StyleSheet.create({
   form: {
-    gap: spacing[3] + 2,
+    gap: spacing[6],
   },
   section: {
     borderWidth: 1,
     borderColor: colors.borderDefault,
     borderRadius: radii['2xl'],
     backgroundColor: colors.bgSurface,
-    padding: spacing[4] + 2,
+    padding: spacing[6],
     ...shadows.sm,
   },
   sectionHeader: {
@@ -263,13 +382,13 @@ const styles = StyleSheet.create({
     marginTop: spacing[1],
   },
   sectionBody: {
-    gap: spacing[4],
+    gap: spacing[5],
   },
   inlineGrid: {
     gap: spacing[4],
   },
   priceGrid: {
-    gap: spacing[3] + 2,
+    gap: spacing[5],
   },
   field: {
     gap: spacing[2],
@@ -394,5 +513,109 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     fontWeight: '900',
+  },
+  dropdownContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  dropdownWrapper: {
+    width: '100%',
+    position: 'relative',
+    zIndex: 10,
+  },
+  dropdownTrigger: {
+    minHeight: 54,
+    borderWidth: 1,
+    borderColor: colors.borderDefault,
+    borderRadius: radii['2xl'],
+    backgroundColor: colors.bgInput,
+    paddingHorizontal: spacing[4],
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dropdownTriggerText: {
+    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  dropdownArrow: {
+    color: colors.textTertiary,
+    fontSize: 11,
+  },
+  dropdownArrowWeb: {
+    color: colors.textTertiary,
+    fontSize: 11,
+    position: 'absolute',
+    right: 16,
+    top: 22,
+    pointerEvents: 'none',
+  },
+  dropdownOptionsList: {
+    marginTop: spacing[1],
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.xl,
+    backgroundColor: colors.bgSurface,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  dropdownOption: {
+    paddingVertical: spacing[3],
+    paddingHorizontal: spacing[4],
+    backgroundColor: colors.bgSurface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderDefault,
+  },
+  dropdownOptionSelected: {
+    backgroundColor: colors.brandSubtle,
+  },
+  dropdownOptionText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  dropdownOptionTextSelected: {
+    color: colors.brandText,
+    fontWeight: '800',
+  },
+  marketplaceSelectorRow: {
+    flexDirection: 'row',
+    gap: spacing[3],
+    width: '100%',
+  },
+  marketplaceBtn: {
+    flex: 1,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.xl,
+    borderWidth: 1,
+  },
+  marketplaceBtnSelected: {
+    borderColor: colors.brandText,
+    backgroundColor: colors.brandSubtle,
+  },
+  marketplaceBtnUnselected: {
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgInput,
+  },
+  marketplaceBtnText: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  marketplaceBtnTextSelected: {
+    color: colors.brandText,
+  },
+  marketplaceBtnTextUnselected: {
+    color: colors.textSecondary,
+  },
+  pressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
   },
 });

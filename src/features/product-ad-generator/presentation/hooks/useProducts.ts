@@ -31,6 +31,7 @@ export function useProducts(pageSize = 10) {
   const [products, setProducts] = useState<Product[]>([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState<number | undefined>();
+  const [totalCount, setTotalCount] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [generatingAd, setGeneratingAd] = useState(false);
@@ -51,6 +52,7 @@ export function useProducts(pageSize = 10) {
         setProducts(result.items);
         setPageNumber(result.pageNumber);
         setTotalPages(result.totalPages);
+        setTotalCount(result.totalCount);
       } catch (err) {
         setProducts(initialList.items);
         setError(getApiErrorMessage(err));
@@ -147,6 +149,7 @@ export function useProducts(pageSize = 10) {
     pageNumber,
     pageSize,
     totalPages,
+    totalCount,
     loading,
     saving,
     generatingAd,
