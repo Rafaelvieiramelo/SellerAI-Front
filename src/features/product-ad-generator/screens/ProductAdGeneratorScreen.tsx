@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   StatusBar,
+  Text,
   View,
   useWindowDimensions,
 } from 'react-native';
