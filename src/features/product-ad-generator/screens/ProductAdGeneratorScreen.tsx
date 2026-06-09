@@ -122,6 +122,7 @@ export default function ProductAdGeneratorScreen() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [detailsProduct, setDetailsProduct] = useState<Product | null>(null);
   const {
     products,
     pageNumber,
@@ -252,6 +253,7 @@ export default function ProductAdGeneratorScreen() {
         onGenerateAd={handleGenerateAd}
         onEdit={handleEdit}
         onDelete={deleteProduct}
+        onShowDetails={setDetailsProduct}
       />
     </>
   );
@@ -282,6 +284,7 @@ export default function ProductAdGeneratorScreen() {
       </KeyboardAvoidingView>
       <LoadingOverlay visible={saving || generatingAd} />
       <ErrorModal message={generationError} onClose={() => setGenerationError(null)} />
+      <ProductDetailsModal product={detailsProduct} onClose={() => setDetailsProduct(null)} />
     </LinearGradient>
   );
 }
@@ -302,6 +305,7 @@ function ProductList({
   onGenerateAd,
   onEdit,
   onDelete,
+  onShowDetails,
 }: {
   products: Product[];
   loading: boolean;
@@ -318,6 +322,7 @@ function ProductList({
   onGenerateAd: () => void;
   onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
+  onShowDetails: (product: Product) => void;
 }) {
   const selectedCount = selectedProductIds.length;
   const canGenerateAd = selectedCount > 0 && !generatingAd;
@@ -354,15 +359,26 @@ function ProductList({
       <View style={styles.productList}>
         {products.map((product) => {
           const selected = selectedProductIds.includes(product.id);
+          const isAiGenerated = getGeneratedProductFields(product).isGeneratedByAI;
 
           return (
             <View key={product.id} style={[styles.productCard, selected && styles.productCardSelected]}>
               <View style={styles.productCardHeader}>
                 <Pressable
-                  onPress={() => onToggleProduct(product.id)}
-                  style={({ pressed }) => [styles.checkbox, selected && styles.checkboxSelected, pressed && styles.pressed]}
+                  onPress={() => {
+                    if (!isAiGenerated) {
+                      onToggleProduct(product.id);
+                    }
+                  }}
+                  disabled={isAiGenerated}
+                  style={({ pressed }) => [
+                    styles.checkbox,
+                    selected && styles.checkboxSelected,
+                    isAiGenerated && styles.checkboxDisabled,
+                    pressed && !isAiGenerated && styles.pressed,
+                  ]}
                 >
-                  <Text style={styles.checkboxText}>{selected ? 'OK' : ''}</Text>
+                  <Text style={styles.checkboxText}>{isAiGenerated ? 'IA' : selected ? 'OK' : ''}</Text>
                 </Pressable>
                 <View style={styles.productInfo}>
                   <Text style={styles.productName}>{product.name}</Text>
@@ -377,9 +393,15 @@ function ProductList({
                 <Text style={styles.productFeatures}>{product.features.slice(0, 4).join(', ')}</Text>
               ) : null}
 
-              {hasGeneratedContent(product) ? <GeneratedAdDetails product={product} /> : null}
-
               <View style={styles.actions}>
+                {isAiGenerated ? (
+                  <Pressable
+                    onPress={() => onShowDetails(product)}
+                    style={({ pressed }) => [styles.detailsButton, pressed && styles.pressed]}
+                  >
+                    <Text style={styles.detailsButtonText}>Detalhes</Text>
+                  </Pressable>
+                ) : null}
                 <Pressable onPress={() => onEdit(product)} style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}>
                   <Text style={styles.actionButtonText}>Editar</Text>
                 </Pressable>
@@ -430,6 +452,87 @@ function GeneratedAdDetails({ product }: { product: Product }) {
 
       {generated.createdAt ? <Text style={styles.generatedDate}>Criado em {formatDate(generated.createdAt)}</Text> : null}
     </View>
+  );
+}
+
+function ProductDetailsModal({ product, onClose }: { product: Product | null; onClose: () => void }) {
+  if (!product) {
+    return null;
+  }
+
+  const generated = getGeneratedProductFields(product);
+
+  return (
+    <Modal visible={Boolean(product)} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={styles.modalBackdrop}>
+        <View style={[styles.modalContent, styles.detailsModalContent]}>
+          <View style={styles.detailsModalHeader}>
+            <View style={styles.generatedHeader}>
+              <Text style={styles.generatedBadge}>IA</Text>
+              <Text style={styles.detailsModalTitle} numberOfLines={1}>
+                {product.name}
+              </Text>
+            </View>
+          </View>
+
+          <ScrollView
+            style={styles.detailsModalScroll}
+            contentContainerStyle={styles.detailsModalScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {generated.titulo ? <GeneratedField label="Título Sugerido" value={generated.titulo} /> : null}
+            {generated.descricao ? <GeneratedField label="Descrição Sugerida" value={generated.descricao} /> : null}
+            {generated.cta ? <GeneratedField label="Chamada para Ação (CTA)" value={generated.cta} /> : null}
+
+            {generated.tags.length ? <GeneratedChips label="Tags Sugeridas" values={generated.tags} /> : null}
+            {generated.caracteristicasDestaque.length ? (
+              <GeneratedChips label="Destaques Recomendados" values={generated.caracteristicasDestaque} />
+            ) : null}
+
+            <View style={styles.detailsModalDivider} />
+
+            <View style={styles.detailsModalFieldRow}>
+              <View style={styles.detailsModalHalfField}>
+                <Text style={styles.generatedLabel}>Categoria</Text>
+                <Text style={styles.generatedValue}>{product.category || 'N/A'}</Text>
+              </View>
+              <View style={styles.detailsModalHalfField}>
+                <Text style={styles.generatedLabel}>Marketplace</Text>
+                <Text style={styles.generatedValue}>{product.marketplace || 'N/A'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailsModalFieldRow}>
+              <View style={styles.detailsModalHalfField}>
+                <Text style={styles.generatedLabel}>Público-Alvo</Text>
+                <Text style={styles.generatedValue}>{product.targetAudience || 'N/A'}</Text>
+              </View>
+              <View style={styles.detailsModalHalfField}>
+                <Text style={styles.generatedLabel}>Tom de Voz</Text>
+                <Text style={styles.generatedValue}>{product.tone || 'N/A'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailsModalFieldRow}>
+              <View style={styles.detailsModalHalfField}>
+                <Text style={styles.generatedLabel}>Preço</Text>
+                <Text style={styles.generatedValue}>{formatPrice(product.price)}</Text>
+              </View>
+              {generated.createdAt ? (
+                <View style={styles.detailsModalHalfField}>
+                  <Text style={styles.generatedLabel}>Criado em</Text>
+                  <Text style={styles.generatedValue}>{formatDate(generated.createdAt)}</Text>
+                </View>
+              ) : null}
+            </View>
+          </ScrollView>
+
+          <Pressable onPress={onClose} style={({ pressed }) => [styles.detailsCloseButton, pressed && styles.pressed]}>
+            <Text style={styles.detailsCloseButtonText}>Fechar Detalhes</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -877,5 +980,78 @@ const styles = StyleSheet.create({
     ...typography.bodySm,
     color: colors.white,
     fontWeight: '900',
+  },
+  checkboxDisabled: {
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.borderDefault,
+    opacity: 0.5,
+  },
+  detailsButton: {
+    minHeight: 42,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.xl,
+    backgroundColor: colors.brandSubtle,
+    borderWidth: 1,
+    borderColor: colors.brandPrimary,
+  },
+  detailsButtonText: {
+    ...typography.bodySm,
+    color: colors.brandText,
+    fontWeight: '900',
+  },
+  detailsModalContent: {
+    maxWidth: 520,
+    maxHeight: '80%',
+    borderColor: colors.borderDefault,
+    backgroundColor: colors.bgSurface,
+    padding: spacing[5],
+  },
+  detailsModalHeader: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderDefault,
+    paddingBottom: spacing[3],
+    marginBottom: spacing[3],
+  },
+  detailsModalTitle: {
+    ...typography.h3,
+    color: colors.textPrimary,
+    fontWeight: '900',
+    flex: 1,
+  },
+  detailsModalScroll: {
+    flex: 1,
+  },
+  detailsModalScrollContent: {
+    gap: spacing[4],
+    paddingBottom: spacing[2],
+  },
+  detailsModalDivider: {
+    height: 1,
+    backgroundColor: colors.borderDefault,
+    marginVertical: spacing[2],
+  },
+  detailsModalFieldRow: {
+    flexDirection: 'row',
+    gap: spacing[4],
+  },
+  detailsModalHalfField: {
+    flex: 1,
+    gap: spacing[1],
+  },
+  detailsCloseButton: {
+    minHeight: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.xl,
+    backgroundColor: colors.brandPrimary,
+    paddingHorizontal: spacing[4],
+    marginTop: spacing[2],
+  },
+  detailsCloseButtonText: {
+    ...typography.body,
+    color: colors.white,
+    fontWeight: '700',
   },
 });
