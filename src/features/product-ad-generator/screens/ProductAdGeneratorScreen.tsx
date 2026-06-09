@@ -19,6 +19,7 @@ import { ProductAdFormData } from '../domain/productAdTypes';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ProductForm } from '../components/ProductForm';
 import { useProducts } from '../presentation/hooks/useProducts';
+import { useAuth } from '../../auth/presentation/contexts/AuthContext';
 import { Product, productFormToCreateRequest } from '../domain/models/Product';
 import { colors } from '../../../theme/colors';
 import { spacing } from '../../../theme/spacing';
@@ -50,6 +51,7 @@ const defaultValues: ProductAdFormData = {
 };
 
 export default function ProductAdGeneratorScreen() {
+  const { user, logout } = useAuth();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -244,6 +246,18 @@ export default function ProductAdGeneratorScreen() {
 
   const screenContent = (
     <>
+      <View style={styles.userSessionRow}>
+        <Text style={styles.userWelcomeText}>
+          Bem-vindo, <Text style={styles.userEmailText}>{user?.email || 'Usuário'}</Text>
+        </Text>
+        <Pressable
+          onPress={logout}
+          style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
+        >
+          <Text style={styles.logoutButtonText}>Sair 🚪</Text>
+        </Pressable>
+      </View>
+
       <PageHeader
         title="Meus Produtos"
         subtitle="Gerencie e acompanhe seus anúncios dos marketplaces de forma centralizada."
