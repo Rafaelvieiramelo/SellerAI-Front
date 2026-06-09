@@ -14,8 +14,10 @@ export function useGoogleAuth(onSuccess: (token: string) => void) {
   });
 
   useEffect(() => {
+    console.log('[useGoogleAuth] Raw auth response:', response);
     if (response?.type === 'success') {
       const token = response.authentication?.accessToken;
+      console.log('[useGoogleAuth] Extracted accessToken:', token);
       if (token) onSuccess(token);
     }
   }, [response]);
