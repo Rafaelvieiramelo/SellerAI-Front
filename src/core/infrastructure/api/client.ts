@@ -11,7 +11,7 @@ const getBaseUrl = () => {
     return 'http://localhost:8080';
   }
 
-  return 'http://192.168.1.7:8080';
+  return 'http://192.168.1.9:8080';
 };
 
 export const apiClient = axios.create({
