@@ -180,12 +180,12 @@ export default function ProductAdGeneratorScreen() {
       if (shouldLock) {
         document.body.style.overflow = 'hidden';
       } else {
-        document.body.style.overflow = '';
+        document.body.style.overflow = 'auto';
       }
     }
     return () => {
       if (Platform.OS === 'web') {
-        document.body.style.overflow = '';
+        document.body.style.overflow = 'auto';
       }
     };
   }, [isFormOpen, detailsProduct, generationError]);
