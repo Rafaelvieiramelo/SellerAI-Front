@@ -36,12 +36,27 @@ export const styles = StyleSheet.create({
   },
   inlineGrid: {
     gap: spacing[4],
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+      },
+    }),
   },
   priceGrid: {
     gap: spacing[5],
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+      },
+    }),
   },
   field: {
     gap: spacing[2],
+    ...Platform.select({
+      web: {
+        flex: 1,
+      },
+    }),
   },
   labelRow: {
     flexDirection: 'row',

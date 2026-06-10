@@ -57,7 +57,7 @@ export default function ProductAdGeneratorScreen() {
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [detailsProduct, setDetailsProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [slideAnim] = useState(new Animated.Value(480));
+  const [slideAnim] = useState(new Animated.Value(100));
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMarketplace, setFilterMarketplace] = useState<'Todos' | 'Shopee' | 'Mercado Livre' | 'Amazon' | 'Outros'>('Todos');
   const [filterStatus, setFilterStatus] = useState<'Todos' | 'Anunciados' | 'Pendentes'>('Todos');
@@ -167,12 +167,28 @@ export default function ProductAdGeneratorScreen() {
       }).start();
     } else {
       Animated.timing(slideAnim, {
-        toValue: 480,
+        toValue: 100,
         duration: 250,
         useNativeDriver: true,
       }).start();
     }
   }, [isFormOpen]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      const shouldLock = isFormOpen || detailsProduct !== null || generationError !== null;
+      if (shouldLock) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
+    return () => {
+      if (Platform.OS === 'web') {
+        document.body.style.overflow = '';
+      }
+    };
+  }, [isFormOpen, detailsProduct, generationError]);
 
   const onSubmit = async (data: ProductAdFormData) => {
     const payload = productFormToCreateRequest(data);
@@ -352,9 +368,18 @@ export default function ProductAdGeneratorScreen() {
       {Platform.OS === 'web' && isFormOpen && (
         <View style={styles.drawerBackdrop}>
           <Pressable style={styles.backdropClickArea} onPress={handleCancelEdit} />
-          <Animated.View style={[styles.drawerContainer, { transform: [{ translateX: slideAnim }] }]}>
+          <Animated.View style={[
+            styles.drawerContainer,
+            {
+              opacity: slideAnim.interpolate({
+                inputRange: [0, 100],
+                outputRange: [1, 0]
+              }),
+              transform: [{ translateY: slideAnim }]
+            }
+          ]}>
             <View style={styles.drawerHeader}>
-              <Animated.Text style={styles.drawerTitle}>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</Animated.Text>
+              <Text style={styles.drawerTitle}>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</Text>
               <Pressable onPress={handleCancelEdit} style={styles.closeDrawerButton}>
                 <Text style={styles.closeDrawerText}>✕</Text>
               </Pressable>
