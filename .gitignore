@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 .expo/
 .expo-shared/
 android/
@@ -10,3 +10,6 @@ dist/
 .vscode/
 .env
 .env.local
+
+# Agent local directory
+.agent/

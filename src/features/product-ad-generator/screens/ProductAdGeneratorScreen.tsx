@@ -19,6 +19,7 @@ import { ProductAdFormData } from '../domain/productAdTypes';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ProductForm } from '../components/ProductForm';
 import { useProducts } from '../presentation/hooks/useProducts';
+import { useAuth } from '../../auth/presentation/contexts/AuthContext';
 import { Product, productFormToCreateRequest } from '../domain/models/Product';
 import { colors } from '../../../theme/colors';
 import { spacing } from '../../../theme/spacing';
@@ -50,12 +51,13 @@ const defaultValues: ProductAdFormData = {
 };
 
 export default function ProductAdGeneratorScreen() {
+  const { user, logout } = useAuth();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [detailsProduct, setDetailsProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [slideAnim] = useState(new Animated.Value(480));
+  const [slideAnim] = useState(new Animated.Value(100));
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMarketplace, setFilterMarketplace] = useState<'Todos' | 'Shopee' | 'Mercado Livre' | 'Amazon' | 'Outros'>('Todos');
   const [filterStatus, setFilterStatus] = useState<'Todos' | 'Anunciados' | 'Pendentes'>('Todos');
@@ -165,12 +167,28 @@ export default function ProductAdGeneratorScreen() {
       }).start();
     } else {
       Animated.timing(slideAnim, {
-        toValue: 480,
+        toValue: 100,
         duration: 250,
         useNativeDriver: true,
       }).start();
     }
   }, [isFormOpen]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      const shouldLock = isFormOpen || detailsProduct !== null || generationError !== null;
+      if (shouldLock) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+    return () => {
+      if (Platform.OS === 'web') {
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }, [isFormOpen, detailsProduct, generationError]);
 
   const onSubmit = async (data: ProductAdFormData) => {
     const payload = productFormToCreateRequest(data);
@@ -244,6 +262,18 @@ export default function ProductAdGeneratorScreen() {
 
   const screenContent = (
     <>
+      <View style={styles.userSessionRow}>
+        <Text style={styles.userWelcomeText}>
+          Bem-vindo, <Text style={styles.userEmailText}>{user?.email || 'Usuário'}</Text>
+        </Text>
+        <Pressable
+          onPress={logout}
+          style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
+        >
+          <Text style={styles.logoutButtonText}>Sair 🚪</Text>
+        </Pressable>
+      </View>
+
       <PageHeader
         title="Meus Produtos"
         subtitle="Gerencie e acompanhe seus anúncios dos marketplaces de forma centralizada."
@@ -338,9 +368,18 @@ export default function ProductAdGeneratorScreen() {
       {Platform.OS === 'web' && isFormOpen && (
         <View style={styles.drawerBackdrop}>
           <Pressable style={styles.backdropClickArea} onPress={handleCancelEdit} />
-          <Animated.View style={[styles.drawerContainer, { transform: [{ translateX: slideAnim }] }]}>
+          <Animated.View style={[
+            styles.drawerContainer,
+            {
+              opacity: slideAnim.interpolate({
+                inputRange: [0, 100],
+                outputRange: [1, 0]
+              }),
+              transform: [{ translateY: slideAnim }]
+            }
+          ]}>
             <View style={styles.drawerHeader}>
-              <Animated.Text style={styles.drawerTitle}>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</Animated.Text>
+              <Text style={styles.drawerTitle}>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</Text>
               <Pressable onPress={handleCancelEdit} style={styles.closeDrawerButton}>
                 <Text style={styles.closeDrawerText}>✕</Text>
               </Pressable>

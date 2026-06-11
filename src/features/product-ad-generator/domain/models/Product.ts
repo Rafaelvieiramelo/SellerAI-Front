@@ -1,5 +1,15 @@
 import { ProductAdFormData } from '../productAdTypes';
 
+export interface ProductVariation {
+  id?: string;
+  productId?: string;
+  color: string;
+  size: string;
+  sku: string;
+  stockQuantity: number;
+  price: number | null;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -17,6 +27,7 @@ export interface Product {
   isGeneratedByAI?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  variations?: ProductVariation[];
 }
 
 export interface ProductListParams {
@@ -40,6 +51,7 @@ export interface CreateProductRequest {
   targetAudience: string;
   price: number;
   tone: string;
+  variations?: ProductVariation[];
 }
 
 export interface UpdateProductRequest extends CreateProductRequest {
@@ -60,4 +72,5 @@ export const productFormToCreateRequest = (data: ProductAdFormData): CreateProdu
   targetAudience: data.audience,
   price: Number(data.salePrice.replace(',', '.')) || 0,
   tone: data.tone,
+  variations: data.variations || [],
 });

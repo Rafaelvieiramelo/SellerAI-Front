@@ -248,7 +248,7 @@ export function ProductList({
           <Pressable
             disabled={!canGoBack || loading}
             onPress={onPrevious}
-            style={({ pressed, hovered }) => [
+            style={({ pressed, hovered }: any) => [
               styles.pageArrowButton,
               (!canGoBack || loading) && styles.disabledButton,
               pressed && styles.pressed,
@@ -266,7 +266,7 @@ export function ProductList({
                 key={page}
                 disabled={loading}
                 onPress={() => onPageSelect(page)}
-                style={({ pressed, hovered }) => [
+                style={({ pressed, hovered }: any) => [
                   styles.pageNumberButton,
                   isActive && styles.pageNumberButtonActive,
                   pressed && styles.pressed,
@@ -286,7 +286,7 @@ export function ProductList({
           <Pressable
             disabled={!canGoForward || loading}
             onPress={onNext}
-            style={({ pressed, hovered }) => [
+            style={({ pressed, hovered }: any) => [
               styles.pageArrowButton,
               (!canGoForward || loading) && styles.disabledButton,
               pressed && styles.pressed,

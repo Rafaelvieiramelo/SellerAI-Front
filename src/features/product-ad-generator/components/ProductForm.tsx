@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Controller, Control, FieldErrors } from 'react-hook-form';
+import { Controller, Control, FieldErrors, useFieldArray } from 'react-hook-form';
 import { Pressable, Platform, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { calculateCommercialMargin } from '../application/generateProductAdMock';
@@ -155,6 +155,11 @@ export function ProductForm({
     [watchedCostPrice, watchedSalePrice],
   );
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'variations',
+  });
+
   return (
     <View style={styles.form}>
       <Section title="Informações principais" eyebrow="Base do anúncio">
@@ -290,6 +295,115 @@ export function ProductForm({
             <VisualOptionSelector options={tones} value={value} onChange={onChange} />
           )}
         />
+      </Section>
+
+      <Section title="Grade de variações" eyebrow="Grade física e estoque">
+        {fields.map((field, index) => (
+          <View key={field.id} style={styles.variationCard}>
+            <View style={styles.variationCardHeader}>
+              <Text style={styles.variationCardTitle}>Variação #{index + 1}</Text>
+              <Pressable
+                onPress={() => remove(index)}
+                style={({ pressed }) => [styles.removeVariationBtn, pressed && styles.pressed]}
+              >
+                <Text style={styles.removeVariationText}>🗑️</Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.inlineGrid}>
+              <Controller
+                control={control}
+                name={`variations.${index}.color` as const}
+                render={({ field: { onChange, value } }) => (
+                  <Field label="Cor" icon="🎨">
+                    <TextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Ex: Preto"
+                      placeholderTextColor={colors.textTertiary}
+                      style={styles.input}
+                    />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name={`variations.${index}.size` as const}
+                render={({ field: { onChange, value } }) => (
+                  <Field label="Tamanho" icon="📏">
+                    <TextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Ex: M"
+                      placeholderTextColor={colors.textTertiary}
+                      style={styles.input}
+                    />
+                  </Field>
+                )}
+              />
+            </View>
+
+            <View style={styles.inlineGrid}>
+              <Controller
+                control={control}
+                name={`variations.${index}.sku` as const}
+                render={({ field: { onChange, value } }) => (
+                  <Field label="SKU" icon="🔑" error={errors.variations?.[index]?.sku?.message}>
+                    <TextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Ex: FONE-BLK-M"
+                      placeholderTextColor={colors.textTertiary}
+                      style={[styles.input, errors.variations?.[index]?.sku && styles.inputError]}
+                    />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name={`variations.${index}.stockQuantity` as const}
+                render={({ field: { onChange, value } }) => (
+                  <Field label="Estoque" icon="📦" error={errors.variations?.[index]?.stockQuantity?.message}>
+                    <TextInput
+                      value={value !== undefined ? String(value) : '0'}
+                      onChangeText={(val) => onChange(Number(val) || 0)}
+                      keyboardType="number-pad"
+                      placeholder="10"
+                      placeholderTextColor={colors.textTertiary}
+                      style={[styles.input, errors.variations?.[index]?.stockQuantity && styles.inputError]}
+                    />
+                  </Field>
+                )}
+              />
+            </View>
+
+            <Controller
+              control={control}
+              name={`variations.${index}.price` as const}
+              render={({ field: { onChange, value } }) => (
+                <Field label="Preço Customizado (Opcional)" icon="$">
+                  <TextInput
+                    value={value !== null && value !== undefined ? String(value) : ''}
+                    onChangeText={(val) => onChange(val === '' ? null : Number(val))}
+                    keyboardType="decimal-pad"
+                    placeholder="Deixe em branco para herdar o preço base"
+                    placeholderTextColor={colors.textTertiary}
+                    style={styles.input}
+                  />
+                </Field>
+              )}
+            />
+          </View>
+        ))}
+
+        <Pressable
+          onPress={() => append({ color: '', size: '', sku: '', stockQuantity: 0, price: null })}
+          style={({ pressed }) => [styles.addVariationBtn, pressed && styles.pressed]}
+        >
+          <Text style={styles.addVariationText}>+ Adicionar Variação</Text>
+        </Pressable>
       </Section>
 
       <Section title="Upload de imagem" eyebrow="Visual do produto">

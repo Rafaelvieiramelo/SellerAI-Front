@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { Product } from '../domain/models/Product';
 import { getGeneratedProductFields, formatDate, formatPrice } from '../utils/productMappers';
 import { styles } from '../screens/ProductAdGeneratorScreen.styles';
+import { ProductMarketplaceListings } from './ProductMarketplaceListings';
 
 interface ProductDetailsModalProps {
   product: Product | null;
@@ -80,6 +81,8 @@ export function ProductDetailsModal({ product, onClose }: ProductDetailsModalPro
                 </View>
               ) : null}
             </View>
+
+            <ProductMarketplaceListings productId={product.id} />
           </ScrollView>
 
           <Pressable onPress={onClose} style={({ pressed }) => [styles.detailsCloseButton, pressed && styles.pressed]}>

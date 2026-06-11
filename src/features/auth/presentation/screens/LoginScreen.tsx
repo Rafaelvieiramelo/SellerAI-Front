@@ -154,7 +154,7 @@ export default function LoginScreen() {
       <Pressable
         onPress={() => promptAsync()}
         disabled={!request || googleLoading}
-        style={({ pressed, hovered }) => [
+        style={({ pressed, hovered }: any) => [
           styles.googleButton,
           pressed && styles.pressed,
           hovered && styles.googleButtonHover

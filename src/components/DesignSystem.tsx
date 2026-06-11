@@ -129,7 +129,7 @@ export function SecondaryButton({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
-      style={({ pressed, hovered }) => [
+      style={({ pressed, hovered }: any) => [
         styles.btnBase,
         styles.btnSecondary,
         fullWidth && styles.wFull,
@@ -182,7 +182,7 @@ export function AIButton({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
-      style={({ pressed, hovered }) => [
+      style={({ pressed, hovered }: any) => [
         styles.btnBase,
         fullWidth && styles.wFull,
         isDisabled && styles.btnDisabled,
@@ -466,7 +466,7 @@ export function ProductCard({
           onToggle();
         }
       }}
-      style={({ pressed, hovered }) => [
+      style={({ pressed, hovered }: any) => [
         styles.productCard,
         selected && styles.productCardSelected,
         hovered && styles.productCardHover,
@@ -526,7 +526,7 @@ export function ProductCard({
         {isAiGenerated ? (
           <Pressable
             onPress={onShowDetails}
-            style={({ pressed, hovered }) => [
+            style={({ pressed, hovered }: any) => [
               styles.detailsButton,
               hovered && styles.detailsButtonHover,
               pressed && styles.pressed
@@ -538,7 +538,7 @@ export function ProductCard({
         
         <Pressable
           onPress={onEdit}
-          style={({ pressed, hovered }) => [
+          style={({ pressed, hovered }: any) => [
             styles.actionButton,
             hovered && styles.actionButtonHover,
             pressed && styles.pressed
@@ -550,13 +550,13 @@ export function ProductCard({
         <Pressable
           onPress={onDelete}
           disabled={deleting}
-          style={({ pressed, hovered }) => [
+          style={({ pressed, hovered }: any) => [
             styles.deleteButton,
             hovered && styles.deleteButtonHover,
             pressed && styles.pressed,
           ]}
         >
-          {({ hovered }) => (
+          {({ hovered }: any) => (
             <Text style={[
               styles.deleteButtonText,
               hovered && { color: colors.error }
@@ -666,7 +666,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     height: 48,
     alignItems: 'stretch',
-    justifyContent: 'stretch',
   },
   btnGradient: {
     flex: 1,
@@ -797,7 +796,7 @@ const styles = StyleSheet.create({
 
   // Marketplace Badges
   mktBadge: {
-    paddingHorizontal: spacing[2.5],
+    paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: radii.full,
     borderWidth: 1,
@@ -845,7 +844,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.xl,
     borderWidth: 1,
     borderColor: colors.borderDefault,
-    paddingHorizontal: spacing[3.5],
+    paddingHorizontal: 14,
     height: 40,
     ...Platform.select({
       web: {
@@ -875,7 +874,7 @@ const styles = StyleSheet.create({
     ...typography.bodySm,
     ...Platform.select({
       web: {
-        outlineStyle: 'none',
+        outlineStyle: 'none' as any,
       },
       default: null,
     }),
@@ -935,8 +934,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   filterSelectOption: {
-    paddingVertical: spacing[2.5],
-    paddingHorizontal: spacing[3.5],
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     borderRadius: radii.lg,
   },
   filterSelectOptionSelected: {
@@ -1213,7 +1212,7 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textTertiary,
     lineHeight: 22,
-    marginTop: spacing[1.5],
+    marginTop: 6,
     maxWidth: 520,
     fontWeight: '600',
   },

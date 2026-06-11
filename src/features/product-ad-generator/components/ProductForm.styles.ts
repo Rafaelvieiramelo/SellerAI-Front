@@ -36,12 +36,27 @@ export const styles = StyleSheet.create({
   },
   inlineGrid: {
     gap: spacing[4],
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+      },
+    }),
   },
   priceGrid: {
     gap: spacing[5],
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+      },
+    }),
   },
   field: {
     gap: spacing[2],
+    ...Platform.select({
+      web: {
+        flex: 1,
+      },
+    }),
   },
   labelRow: {
     flexDirection: 'row',
@@ -267,5 +282,49 @@ export const styles = StyleSheet.create({
   pressed: {
     transform: [{ scale: 0.98 }],
     opacity: 0.9,
+  },
+  variationCard: {
+    borderWidth: 1,
+    borderColor: colors.borderDefault,
+    borderRadius: radii.xl,
+    backgroundColor: colors.bgInput,
+    padding: spacing[4],
+    gap: spacing[3],
+    marginBottom: spacing[3],
+  },
+  variationCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderDefault,
+    paddingBottom: spacing[2],
+  },
+  variationCardTitle: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: colors.textPrimary,
+  },
+  removeVariationBtn: {
+    padding: spacing[1],
+  },
+  removeVariationText: {
+    fontSize: 16,
+  },
+  addVariationBtn: {
+    minHeight: 48,
+    borderRadius: radii.xl,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: colors.brandPrimary,
+    backgroundColor: colors.brandSubtle,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing[2],
+  },
+  addVariationText: {
+    color: colors.brandText,
+    fontWeight: '800',
+    fontSize: 14,
   },
 });

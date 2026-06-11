@@ -229,7 +229,7 @@ export const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 15,
     ...Platform.select({
-      web: { outlineStyle: 'none' },
+      web: { outlineStyle: 'none' as any },
       default: null,
     }),
   },

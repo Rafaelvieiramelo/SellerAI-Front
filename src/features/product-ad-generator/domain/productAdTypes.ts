@@ -19,6 +19,14 @@ export interface ProductAdFormData {
   targetMargin: string;
   tone: AdTone;
   imageUri?: string;
+  variations?: {
+    id?: string;
+    color: string;
+    size: string;
+    sku: string;
+    stockQuantity: number;
+    price: number | null;
+  }[];
 }
 
 export interface GeneratedProductAd {

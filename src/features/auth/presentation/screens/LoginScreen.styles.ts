@@ -224,7 +224,7 @@ export const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 15,
     ...Platform.select({
-      web: { outlineStyle: 'none' },
+      web: { outlineStyle: 'none' as any },
       default: null,
     }),
   },
@@ -257,7 +257,6 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: spacing[2],
     height: 48,
-    justifyContent: 'stretch',
     alignItems: 'stretch',
     ...Platform.select({
       web: { transition: 'all 200ms ease' },
