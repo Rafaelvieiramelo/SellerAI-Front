@@ -105,4 +105,12 @@ export const productToFormData = (product: Product): ProductAdFormData => ({
   targetMargin: defaultValues.targetMargin,
   tone: firstAllowedValue(product.tone, tones, defaultValues.tone),
   imageUri: undefined,
+  variations: product.variations ? product.variations.map(v => ({
+    id: v.id,
+    color: v.color,
+    size: v.size,
+    sku: v.sku,
+    stockQuantity: v.stockQuantity,
+    price: v.price
+  })) : [],
 });

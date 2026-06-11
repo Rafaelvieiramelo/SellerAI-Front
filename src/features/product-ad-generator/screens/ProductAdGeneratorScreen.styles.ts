@@ -304,7 +304,7 @@ export const styles = StyleSheet.create({
     fontWeight: '900',
   },
   platformBadge: {
-    paddingHorizontal: spacing[2.5],
+    paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: radii.full,
     borderWidth: 1,
@@ -449,7 +449,7 @@ export const styles = StyleSheet.create({
     padding: spacing[6],
     ...Platform.select({
       web: {
-        position: 'fixed',
+        position: 'fixed' as any,
       },
     }),
   },
@@ -699,11 +699,11 @@ export const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 10,
     fontWeight: '900',
-    paddingHorizontal: spacing[1.5],
-    paddingVertical: spacing[0.5],
+    paddingHorizontal: 6,
+    paddingVertical: 2,
   },
   generatedField: {
-    gap: spacing[1.5],
+    gap: 6,
     backgroundColor: colors.bgInput,
     padding: spacing[3],
     borderRadius: radii.xl,
@@ -831,32 +831,6 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.bgSurfaceActive,
     borderColor: colors.borderStrong,
   },
-  deleteButton: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.lg,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    ...Platform.select({
-      web: {
-        transitionProperty: 'all',
-        transitionDuration: '200ms',
-        cursor: 'pointer',
-      },
-      default: null,
-    }),
-  },
-  deleteButtonHover: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderColor: 'rgba(239, 68, 68, 0.2)',
-  },
-  deleteButtonText: {
-    fontSize: 14,
-    color: colors.textTertiary,
-  },
   metricsContainer: {
     marginBottom: spacing[6],
     width: '100%',
@@ -957,7 +931,7 @@ export const styles = StyleSheet.create({
     zIndex: 99,
   },
   filterSelectOption: {
-    paddingVertical: spacing[2.5],
+    paddingVertical: 10,
     paddingHorizontal: spacing[3],
     backgroundColor: colors.bgSurface,
     borderBottomWidth: 1,
@@ -983,7 +957,7 @@ export const styles = StyleSheet.create({
   pageSelectorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[1.5],
+    gap: 6,
   },
   pageArrowButton: {
     width: 32,
@@ -1056,9 +1030,9 @@ export const styles = StyleSheet.create({
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[1.5],
-    paddingVertical: spacing[1.5],
-    paddingHorizontal: spacing[3.5],
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     borderRadius: radii.lg,
     backgroundColor: colors.errorSubtle,
     borderWidth: 1,
