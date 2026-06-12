@@ -18,8 +18,7 @@ Este é o cliente mobile e web do **SellerAI**, desenvolvido em **React Native**
 
 ## 📁 Principais Funcionalidades da UI
 - **Geração de Anúncios com IA:** Formulário rico para preenchimento de detalhes comerciais e envio à IA do Gemini (para geração automatizada de títulos, copys e tags).
-- **Grade de Variações de Estoque:** Interface dinâmica com `useFieldArray` que permite gerenciar Cor, Tamanho, SKU e Preço de custo de forma inline por variação de produto.
-- **Canais de Venda / Marketplaces:** Seção no modal de detalhes que permite vincular o produto local a anúncios ativos da Shopee ou Mercado Livre.
+- **Gestão Multicanal Centralizada:** Permite configurar SKU central, estoque central, preço de custo e gerenciar anúncios ativáveis (listings) para Shopee e Mercado Livre com preços de venda independentes por canal.
 
 ---
 

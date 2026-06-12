@@ -11,21 +11,18 @@ export type AdTone = (typeof tones)[number];
 export interface ProductAdFormData {
   productName: string;
   category: ProductCategory;
-  marketplace: Marketplace;
-  features: string[];
-  audience: Audience;
+  sku: string;
+  stockQuantity: number;
   costPrice: string;
-  salePrice: string;
   targetMargin: string;
   tone: AdTone;
+  audience: Audience;
+  features: string[];
   imageUri?: string;
-  variations?: {
-    id?: string;
-    color: string;
-    size: string;
-    sku: string;
-    stockQuantity: number;
-    price: number | null;
+  listings?: {
+    marketplace: string;
+    price: string;
+    enabled: boolean;
   }[];
 }
 

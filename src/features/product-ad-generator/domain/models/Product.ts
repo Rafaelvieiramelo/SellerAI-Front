@@ -1,33 +1,35 @@
 import { ProductAdFormData } from '../productAdTypes';
 
-export interface ProductVariation {
+export interface ProductListing {
   id?: string;
   productId?: string;
-  color: string;
-  size: string;
-  sku: string;
-  stockQuantity: number;
-  price: number | null;
-}
-
-export interface Product {
-  id: string;
-  name: string;
-  category: string | null;
-  marketplace: string | null;
-  features: string[];
-  targetAudience: string | null;
+  marketplace: string;
+  externalId?: string;
+  url?: string;
   price: number;
-  tone: string | null;
+  status: string;
+  publishedAt?: string;
   generatedTitulo?: string;
   generatedDescricao?: string;
   generatedTags?: string[];
   generatedCaracteristicasDestaque?: string[];
   generatedCta?: string;
   isGeneratedByAI?: boolean;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  category: string | null;
+  sku: string;
+  stockQuantity: number;
+  costPrice: number;
+  features: string[];
+  targetAudience: string | null;
+  tone: string | null;
   createdAt?: string;
   updatedAt?: string;
-  variations?: ProductVariation[];
+  listings?: ProductListing[];
 }
 
 export interface ProductListParams {
@@ -43,15 +45,21 @@ export interface ProductListResult {
   totalPages?: number;
 }
 
+export interface ProductListingRequest {
+  marketplace: string;
+  price: number;
+}
+
 export interface CreateProductRequest {
   name: string;
   category: string;
-  marketplace: string;
+  sku: string;
+  stockQuantity: number;
+  costPrice: number;
   features: string[];
   targetAudience: string;
-  price: number;
   tone: string;
-  variations?: ProductVariation[];
+  listings?: ProductListingRequest[];
 }
 
 export interface UpdateProductRequest extends CreateProductRequest {
@@ -67,10 +75,16 @@ export type GenerateProductAdResponse = Product[] | Product | Record<string, unk
 export const productFormToCreateRequest = (data: ProductAdFormData): CreateProductRequest => ({
   name: data.productName.trim(),
   category: data.category,
-  marketplace: data.marketplace,
+  sku: data.sku.trim(),
+  stockQuantity: data.stockQuantity,
+  costPrice: Number(data.costPrice.replace(',', '.')) || 0,
   features: data.features.map((feature) => feature.trim()).filter(Boolean),
   targetAudience: data.audience,
-  price: Number(data.salePrice.replace(',', '.')) || 0,
   tone: data.tone,
-  variations: data.variations || [],
+  listings: (data.listings || [])
+    .filter((l) => l.enabled)
+    .map((l) => ({
+      marketplace: l.marketplace,
+      price: Number(l.price.replace(',', '.')) || 0,
+    })),
 });

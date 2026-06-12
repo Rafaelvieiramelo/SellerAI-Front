@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Controller, Control, FieldErrors, useFieldArray } from 'react-hook-form';
+import { Controller, Control, FieldErrors, useFieldArray, useWatch } from 'react-hook-form';
 import { Pressable, Platform, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { calculateCommercialMargin } from '../application/generateProductAdMock';
-import { audiences, categories, marketplaces, ProductAdFormData, tones } from '../domain/productAdTypes';
+import { audiences, categories, ProductAdFormData, tones } from '../domain/productAdTypes';
 import { FeatureTagsInput } from './FeatureTagsInput';
 import { ImageUploader } from './ImageUploader';
 import { VisualOptionSelector } from './VisualOptionSelector';
@@ -93,42 +93,6 @@ function CategorySelect({ value, onChange, options }: CategorySelectProps) {
   );
 }
 
-interface MarketplaceSelectorProps {
-  value: string;
-  onChange: (val: any) => void;
-  options: readonly string[];
-}
-
-function MarketplaceSelector({ value, onChange, options }: MarketplaceSelectorProps) {
-  return (
-    <View style={styles.marketplaceSelectorRow}>
-      {options.map((opt) => {
-        const isSelected = value === opt;
-        return (
-          <Pressable
-            key={opt}
-            onPress={() => onChange(opt)}
-            style={({ pressed }) => [
-              styles.marketplaceBtn,
-              isSelected ? styles.marketplaceBtnSelected : styles.marketplaceBtnUnselected,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text
-              style={[
-                styles.marketplaceBtnText,
-                isSelected ? styles.marketplaceBtnTextSelected : styles.marketplaceBtnTextUnselected,
-              ]}
-            >
-              {opt}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
 interface ProductFormProps {
   control: Control<ProductAdFormData>;
   errors: FieldErrors<ProductAdFormData>;
@@ -136,8 +100,6 @@ interface ProductFormProps {
   onSubmit: () => void;
   onCancelEdit?: () => void;
   submitLabel?: string;
-  watchedCostPrice: string;
-  watchedSalePrice: string;
 }
 
 export function ProductForm({
@@ -147,17 +109,21 @@ export function ProductForm({
   onSubmit,
   onCancelEdit,
   submitLabel,
-  watchedCostPrice,
-  watchedSalePrice,
 }: ProductFormProps) {
+  const watchedCostPrice = useWatch({ control, name: 'costPrice' }) || '';
+  const watchedListings = useWatch({ control, name: 'listings' }) || [];
+
+  const firstEnabledListing = watchedListings.find(l => l.enabled && l.price);
+  const watchedSalePrice = firstEnabledListing ? firstEnabledListing.price : '';
+
   const margin = useMemo(
     () => calculateCommercialMargin(watchedCostPrice, watchedSalePrice),
     [watchedCostPrice, watchedSalePrice],
   );
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields } = useFieldArray({
     control,
-    name: 'variations',
+    name: 'listings',
   });
 
   return (
@@ -192,14 +158,37 @@ export function ProductForm({
 
           <Controller
             control={control}
-            name="marketplace"
+            name="sku"
             render={({ field: { onChange, value } }) => (
-              <Field label="Marketplace" icon="M">
-                <MarketplaceSelector options={marketplaces} value={value} onChange={onChange} />
+              <Field label="SKU Central" icon="🔑" error={errors.sku?.message}>
+                <TextInput
+                  value={value}
+                  onChangeText={onChange}
+                  placeholder="Ex: FONE-RGB-01"
+                  placeholderTextColor={colors.textTertiary}
+                  style={[styles.input, errors.sku && styles.inputError]}
+                />
               </Field>
             )}
           />
         </View>
+
+        <Controller
+          control={control}
+          name="stockQuantity"
+          render={({ field: { onChange, value } }) => (
+            <Field label="Estoque Central" icon="📦" error={errors.stockQuantity?.message}>
+              <TextInput
+                value={value !== undefined ? String(value) : '0'}
+                onChangeText={(val) => onChange(Number(val) || 0)}
+                keyboardType="number-pad"
+                placeholder="Ex: 50"
+                placeholderTextColor={colors.textTertiary}
+                style={[styles.input, errors.stockQuantity && styles.inputError]}
+              />
+            </Field>
+          )}
+        />
       </Section>
 
       <Section title="Características" eyebrow="Contexto para IA">
@@ -223,12 +212,12 @@ export function ProductForm({
       </Section>
 
       <Section title="Informações comerciais" eyebrow="Preço e margem">
-        <View style={styles.priceGrid}>
+        <View style={styles.inlineGrid}>
           <Controller
             control={control}
             name="costPrice"
             render={({ field: { onChange, value } }) => (
-              <Field label="Preço de custo" icon="$" error={errors.costPrice?.message}>
+              <Field label="Preço de custo base" icon="$" error={errors.costPrice?.message}>
                 <TextInput
                   value={value}
                   onChangeText={onChange}
@@ -243,26 +232,9 @@ export function ProductForm({
 
           <Controller
             control={control}
-            name="salePrice"
-            render={({ field: { onChange, value } }) => (
-              <Field label="Preço de venda" icon="$" error={errors.salePrice?.message}>
-                <TextInput
-                  value={value}
-                  onChangeText={onChange}
-                  keyboardType="decimal-pad"
-                  placeholder="0,00"
-                  placeholderTextColor={colors.textTertiary}
-                  style={[styles.input, errors.salePrice && styles.inputError]}
-                />
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={control}
             name="targetMargin"
             render={({ field: { onChange, value } }) => (
-              <Field label="Margem desejada" icon="%">
+              <Field label="Margem desejada (%)" icon="%">
                 <TextInput
                   value={value}
                   onChangeText={onChange}
@@ -279,12 +251,70 @@ export function ProductForm({
         <View style={styles.marginPanel}>
           <View>
             <Text style={styles.marginLabel}>Margem automática</Text>
-            <Text style={styles.marginHint}>Calculada pelo custo e venda informados.</Text>
+            <Text style={styles.marginHint}>Calculada com base no 1º canal ativado.</Text>
           </View>
           <View style={[styles.marginBadge, margin >= 25 && styles.marginBadgeGood]}>
             <Text style={styles.marginBadgeText}>{margin}%</Text>
           </View>
         </View>
+      </Section>
+
+      <Section title="Canais de venda" eyebrow="Habilitar e definir preços">
+        {fields.map((field, index) => {
+          const isEnabled = watchedListings[index]?.enabled;
+          return (
+            <View key={field.id} style={styles.variationCard}>
+              <View style={[styles.variationCardHeader, { justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }]}>
+                <Text style={styles.variationCardTitle}>{(field as any).marketplace}</Text>
+                <Controller
+                  control={control}
+                  name={`listings.${index}.enabled` as const}
+                  render={({ field: { onChange, value } }) => (
+                    <Pressable
+                      onPress={() => onChange(!value)}
+                      style={({ pressed }) => [
+                        {
+                          backgroundColor: value ? colors.brandPrimary : colors.bgInput,
+                          borderColor: value ? colors.brandPrimary : colors.borderDefault,
+                          borderWidth: 1,
+                          borderRadius: 8,
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                        },
+                        pressed && styles.pressed,
+                      ]}
+                    >
+                      <Text style={{ color: value ? '#fff' : colors.textSecondary, fontWeight: '700', fontSize: 13 }}>
+                        {value ? 'Ativado ✓' : 'Desativado'}
+                      </Text>
+                    </Pressable>
+                  )}
+                />
+              </View>
+
+              {isEnabled && (
+                <View style={{ marginTop: 12 }}>
+                  <Controller
+                    control={control}
+                    name={`listings.${index}.price` as const}
+                    render={({ field: { onChange, value } }) => (
+                      <Field label="Preço de venda específico" icon="$" error={errors.listings?.[index]?.price?.message}>
+                        <TextInput
+                          value={value}
+                          onChangeText={onChange}
+                          keyboardType="decimal-pad"
+                          placeholder="0,00"
+                          placeholderTextColor={colors.textTertiary}
+                          style={[styles.input, errors.listings?.[index]?.price && styles.inputError]}
+                        />
+                      </Field>
+                    )}
+                  />
+                </View>
+              )}
+            </View>
+          );
+        })}
       </Section>
 
       <Section title="Tom do anúncio" eyebrow="Personalidade da copy">
@@ -295,115 +325,6 @@ export function ProductForm({
             <VisualOptionSelector options={tones} value={value} onChange={onChange} />
           )}
         />
-      </Section>
-
-      <Section title="Grade de variações" eyebrow="Grade física e estoque">
-        {fields.map((field, index) => (
-          <View key={field.id} style={styles.variationCard}>
-            <View style={styles.variationCardHeader}>
-              <Text style={styles.variationCardTitle}>Variação #{index + 1}</Text>
-              <Pressable
-                onPress={() => remove(index)}
-                style={({ pressed }) => [styles.removeVariationBtn, pressed && styles.pressed]}
-              >
-                <Text style={styles.removeVariationText}>🗑️</Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.inlineGrid}>
-              <Controller
-                control={control}
-                name={`variations.${index}.color` as const}
-                render={({ field: { onChange, value } }) => (
-                  <Field label="Cor" icon="🎨">
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Ex: Preto"
-                      placeholderTextColor={colors.textTertiary}
-                      style={styles.input}
-                    />
-                  </Field>
-                )}
-              />
-
-              <Controller
-                control={control}
-                name={`variations.${index}.size` as const}
-                render={({ field: { onChange, value } }) => (
-                  <Field label="Tamanho" icon="📏">
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Ex: M"
-                      placeholderTextColor={colors.textTertiary}
-                      style={styles.input}
-                    />
-                  </Field>
-                )}
-              />
-            </View>
-
-            <View style={styles.inlineGrid}>
-              <Controller
-                control={control}
-                name={`variations.${index}.sku` as const}
-                render={({ field: { onChange, value } }) => (
-                  <Field label="SKU" icon="🔑" error={errors.variations?.[index]?.sku?.message}>
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Ex: FONE-BLK-M"
-                      placeholderTextColor={colors.textTertiary}
-                      style={[styles.input, errors.variations?.[index]?.sku && styles.inputError]}
-                    />
-                  </Field>
-                )}
-              />
-
-              <Controller
-                control={control}
-                name={`variations.${index}.stockQuantity` as const}
-                render={({ field: { onChange, value } }) => (
-                  <Field label="Estoque" icon="📦" error={errors.variations?.[index]?.stockQuantity?.message}>
-                    <TextInput
-                      value={value !== undefined ? String(value) : '0'}
-                      onChangeText={(val) => onChange(Number(val) || 0)}
-                      keyboardType="number-pad"
-                      placeholder="10"
-                      placeholderTextColor={colors.textTertiary}
-                      style={[styles.input, errors.variations?.[index]?.stockQuantity && styles.inputError]}
-                    />
-                  </Field>
-                )}
-              />
-            </View>
-
-            <Controller
-              control={control}
-              name={`variations.${index}.price` as const}
-              render={({ field: { onChange, value } }) => (
-                <Field label="Preço Customizado (Opcional)" icon="$">
-                  <TextInput
-                    value={value !== null && value !== undefined ? String(value) : ''}
-                    onChangeText={(val) => onChange(val === '' ? null : Number(val))}
-                    keyboardType="decimal-pad"
-                    placeholder="Deixe em branco para herdar o preço base"
-                    placeholderTextColor={colors.textTertiary}
-                    style={styles.input}
-                  />
-                </Field>
-              )}
-            />
-          </View>
-        ))}
-
-        <Pressable
-          onPress={() => append({ color: '', size: '', sku: '', stockQuantity: 0, price: null })}
-          style={({ pressed }) => [styles.addVariationBtn, pressed && styles.pressed]}
-        >
-          <Text style={styles.addVariationText}>+ Adicionar Variação</Text>
-        </Pressable>
       </Section>
 
       <Section title="Upload de imagem" eyebrow="Visual do produto">
@@ -465,4 +386,3 @@ function Field({
     </View>
   );
 }
-

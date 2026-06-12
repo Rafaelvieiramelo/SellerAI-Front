@@ -53,8 +53,8 @@ export function ProductDetailsModal({ product, onClose }: ProductDetailsModalPro
                 <Text style={styles.generatedValue}>{product.category || 'N/A'}</Text>
               </View>
               <View style={styles.detailsModalHalfField}>
-                <Text style={styles.generatedLabel}>Marketplace</Text>
-                <Text style={styles.generatedValue}>{product.marketplace || 'N/A'}</Text>
+                <Text style={styles.generatedLabel}>SKU</Text>
+                <Text style={styles.generatedValue}>{product.sku || 'N/A'}</Text>
               </View>
             </View>
 
@@ -71,15 +71,13 @@ export function ProductDetailsModal({ product, onClose }: ProductDetailsModalPro
 
             <View style={styles.detailsModalFieldRow}>
               <View style={styles.detailsModalHalfField}>
-                <Text style={styles.generatedLabel}>Preço</Text>
-                <Text style={styles.generatedValue}>{formatPrice(product.price)}</Text>
+                <Text style={styles.generatedLabel}>Estoque Central</Text>
+                <Text style={styles.generatedValue}>{product.stockQuantity ?? 0} unid.</Text>
               </View>
-              {generated.createdAt ? (
-                <View style={styles.detailsModalHalfField}>
-                  <Text style={styles.generatedLabel}>Criado em</Text>
-                  <Text style={styles.generatedValue}>{formatDate(generated.createdAt)}</Text>
-                </View>
-              ) : null}
+              <View style={styles.detailsModalHalfField}>
+                <Text style={styles.generatedLabel}>Preço de Custo</Text>
+                <Text style={styles.generatedValue}>{formatPrice(product.costPrice)}</Text>
+              </View>
             </View>
 
             <ProductMarketplaceListings productId={product.id} />

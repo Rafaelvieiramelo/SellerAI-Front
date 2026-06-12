@@ -40,14 +40,18 @@ import {
 const defaultValues: ProductAdFormData = {
   productName: '',
   category: 'Eletrônicos',
-  marketplace: 'Shopee',
-  features: ['Bluetooth 5.3', 'RGB', 'Baixa Latência'],
-  audience: 'Gamer',
+  sku: '',
+  stockQuantity: 0,
   costPrice: '',
-  salePrice: '',
   targetMargin: '30',
   tone: 'Persuasivo',
+  audience: 'Gamer',
+  features: ['Bluetooth 5.3', 'RGB', 'Baixa Latência'],
   imageUri: undefined,
+  listings: [
+    { marketplace: 'Shopee', price: '', enabled: false },
+    { marketplace: 'Mercado Livre', price: '', enabled: false },
+  ],
 };
 
 export default function ProductAdGeneratorScreen() {
@@ -90,18 +94,21 @@ export default function ProductAdGeneratorScreen() {
       list = list.filter((p) =>
         p.name?.toLowerCase().includes(query) ||
         p.category?.toLowerCase().includes(query) ||
-        p.marketplace?.toLowerCase().includes(query)
+        p.listings?.some((l) => l.marketplace?.toLowerCase().includes(query))
       );
     }
 
     // 2. Marketplace Filter
     if (filterMarketplace !== 'Todos') {
       list = list.filter((p) => {
-        const pMkt = p.marketplace?.toLowerCase() || '';
-        if (filterMarketplace === 'Mercado Livre') return pMkt.includes('mercado') || pMkt.includes('livre') || pMkt === 'ml';
-        if (filterMarketplace === 'Shopee') return pMkt.includes('shopee');
-        if (filterMarketplace === 'Amazon') return pMkt.includes('amazon');
-        return !pMkt.includes('mercado') && !pMkt.includes('livre') && pMkt !== 'ml' && !pMkt.includes('shopee') && !pMkt.includes('amazon');
+        const matches = p.listings?.some((l) => {
+          const lMkt = l.marketplace.toLowerCase();
+          if (filterMarketplace === 'Mercado Livre') return lMkt.includes('mercado') || lMkt.includes('livre') || lMkt === 'ml';
+          if (filterMarketplace === 'Shopee') return lMkt.includes('shopee');
+          if (filterMarketplace === 'Amazon') return lMkt.includes('amazon');
+          return false;
+        });
+        return matches;
       });
     }
 
@@ -119,10 +126,10 @@ export default function ProductAdGeneratorScreen() {
         return (a.name || '').localeCompare(b.name || '');
       }
       if (sortBy === 'PrecoCrescente') {
-        return (a.price || 0) - (b.price || 0);
+        return (a.costPrice || 0) - (b.costPrice || 0);
       }
       if (sortBy === 'PrecoDecrescente') {
-        return (b.price || 0) - (a.price || 0);
+        return (b.costPrice || 0) - (a.costPrice || 0);
       }
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -255,32 +262,21 @@ export default function ProductAdGeneratorScreen() {
       onSubmit={handleSubmit(onSubmit)}
       onCancelEdit={handleCancelEdit}
       submitLabel="Salvar Produto"
-      watchedCostPrice={watch('costPrice')}
-      watchedSalePrice={watch('salePrice')}
     />
   );
 
   const screenContent = (
     <>
-      <View style={styles.userSessionRow}>
-        <Text style={styles.userWelcomeText}>
-          Bem-vindo, <Text style={styles.userEmailText}>{user?.email || 'Usuário'}</Text>
-        </Text>
-        <Pressable
-          onPress={logout}
-          style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
-        >
-          <Text style={styles.logoutButtonText}>Sair 🚪</Text>
-        </Pressable>
-      </View>
-
       <PageHeader
         title="Meus Produtos"
         subtitle="Gerencie e acompanhe seus anúncios dos marketplaces de forma centralizada."
         badgeText="SellerAI Products"
         action={
           Platform.OS === 'web' && (
-            <PrimaryButton title="+ Novo Produto" onPress={handleNewProduct} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+              <PrimaryButton title="+ Novo Produto" onPress={handleNewProduct} />
+              <UserProfileDropdown user={user} logout={logout} />
+            </View>
           )
         }
       />
@@ -424,5 +420,126 @@ export default function ProductAdGeneratorScreen() {
       <ErrorModal message={generationError} onClose={() => setGenerationError(null)} />
       <ProductDetailsModal product={detailsProduct} onClose={() => setDetailsProduct(null)} />
     </LinearGradient>
+  );
+}
+
+function UserProfileDropdown({ user, logout }: { user: any; logout: () => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'US';
+
+  return (
+    <View style={{ position: 'relative', zIndex: 9999 }}>
+      <Pressable
+        onPress={() => setIsOpen(!isOpen)}
+        style={({ pressed }) => [
+          {
+            width: 42,
+            height: 42,
+            borderRadius: 21,
+            backgroundColor: colors.brandPrimary,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderWidth: 2,
+            borderColor: colors.borderDefault,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 3,
+          },
+          pressed && { opacity: 0.8 },
+        ]}
+      >
+        <Text style={{ color: '#fff', fontSize: 15, fontWeight: '700' }}>{initials}</Text>
+      </Pressable>
+
+      {isOpen && (
+        <>
+          {Platform.OS === 'web' && (
+            <Pressable
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 9998,
+              } as any}
+              onPress={() => setIsOpen(false)}
+            />
+          )}
+          <View
+            style={{
+              position: 'absolute',
+              top: 50,
+              right: 0,
+              width: 240,
+              backgroundColor: colors.bgSurface,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: colors.borderDefault,
+              padding: 16,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 5,
+              zIndex: 9999,
+            }}
+          >
+            <Text
+              style={{
+                color: colors.textSecondary,
+                fontSize: 12,
+                fontWeight: '600',
+                marginBottom: 4,
+              }}
+            >
+              CONTA ATIVA
+            </Text>
+            <Text
+              style={{
+                color: colors.textPrimary,
+                fontSize: 14,
+                fontWeight: '700',
+                marginBottom: 16,
+                wordBreak: 'break-all',
+              } as any}
+              numberOfLines={1}
+            >
+              {user?.email || 'usuario@sellerai.com'}
+            </Text>
+            <View
+              style={{
+                height: 1,
+                backgroundColor: colors.borderDefault,
+                marginBottom: 12,
+              }}
+            />
+            <Pressable
+              onPress={() => {
+                setIsOpen(false);
+                logout();
+              }}
+              style={({ pressed }) => [
+                {
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  paddingVertical: 10,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: 'rgba(239, 68, 68, 0.2)',
+                },
+                pressed && { opacity: 0.8 },
+              ]}
+            >
+              <Text style={{ color: '#ef4444', fontWeight: '700', fontSize: 13 }}>Sair da Conta</Text>
+            </Pressable>
+          </View>
+        </>
+      )}
+    </View>
   );
 }
