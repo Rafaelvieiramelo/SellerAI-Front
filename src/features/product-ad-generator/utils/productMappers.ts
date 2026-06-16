@@ -2,7 +2,6 @@ import { Product } from '../domain/models/Product';
 import {
   audiences,
   categories,
-  marketplaces,
   ProductAdFormData,
   tones,
 } from '../domain/productAdTypes';
@@ -10,14 +9,18 @@ import {
 const defaultValues: ProductAdFormData = {
   productName: '',
   category: 'Eletrônicos',
-  marketplace: 'Shopee',
-  features: ['Bluetooth 5.3', 'RGB', 'Baixa Latência'],
-  audience: 'Gamer',
+  sku: '',
+  stockQuantity: 0,
   costPrice: '',
-  salePrice: '',
   targetMargin: '30',
   tone: 'Persuasivo',
+  audience: 'Gamer',
+  features: ['Bluetooth 5.3', 'RGB', 'Baixa Latência'],
   imageUri: undefined,
+  listings: [
+    { marketplace: 'Shopee', price: '', enabled: false },
+    { marketplace: 'Mercado Livre', price: '', enabled: false },
+  ],
 };
 
 export const firstAllowedValue = <T extends readonly string[]>(
@@ -49,68 +52,51 @@ export const formatDate = (value?: string) => {
   }).format(date);
 };
 
-export const readString = (product: Product, camelKey: keyof Product, pascalKey: string) => {
-  const fallbackValue = (product as unknown as Record<string, unknown>)[pascalKey];
-  const value = product[camelKey] ?? fallbackValue;
-  return typeof value === 'string' ? value : '';
+export const getGeneratedProductFields = (product: Product) => {
+  const firstWithAi = product.listings?.find((l) => l.isGeneratedByAI || l.generatedTitulo);
+  const target = firstWithAi || product.listings?.[0];
+  return {
+    titulo: target?.generatedTitulo || '',
+    descricao: target?.generatedDescricao || '',
+    tags: target?.generatedTags || [],
+    caracteristicasDestaque: target?.generatedCaracteristicasDestaque || [],
+    cta: target?.generatedCta || '',
+    isGeneratedByAI: target?.isGeneratedByAI || false,
+    createdAt: target?.publishedAt || product.createdAt || '',
+  };
 };
-
-export const readStringList = (product: Product, camelKey: keyof Product, pascalKey: string) => {
-  const fallbackValue = (product as unknown as Record<string, unknown>)[pascalKey];
-  const value = product[camelKey] ?? fallbackValue;
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
-};
-
-export const readBoolean = (product: Product, camelKey: keyof Product, pascalKey: string) => {
-  const fallbackValue = (product as unknown as Record<string, unknown>)[pascalKey];
-  const value = product[camelKey] ?? fallbackValue;
-  return typeof value === 'boolean' ? value : false;
-};
-
-export const getGeneratedProductFields = (product: Product) => ({
-  titulo: readString(product, 'generatedTitulo', 'GeneratedTitulo'),
-  descricao: readString(product, 'generatedDescricao', 'GeneratedDescricao'),
-  tags: readStringList(product, 'generatedTags', 'GeneratedTags'),
-  caracteristicasDestaque: readStringList(
-    product,
-    'generatedCaracteristicasDestaque',
-    'GeneratedCaracteristicasDestaque'
-  ),
-  cta: readString(product, 'generatedCta', 'GeneratedCta'),
-  isGeneratedByAI: readBoolean(product, 'isGeneratedByAI', 'IsGeneratedByAI'),
-  createdAt: readString(product, 'createdAt', 'CreatedAt'),
-});
 
 export const hasGeneratedContent = (product: Product) => {
-  const generated = getGeneratedProductFields(product);
-
-  return Boolean(
-    generated.isGeneratedByAI ||
-      generated.titulo ||
-      generated.descricao ||
-      generated.tags.length ||
-      generated.caracteristicasDestaque.length ||
-      generated.cta
-  );
+  return product.listings?.some((l) => l.isGeneratedByAI || l.generatedTitulo) ?? false;
 };
 
-export const productToFormData = (product: Product): ProductAdFormData => ({
-  productName: product.name ?? '',
-  category: firstAllowedValue(product.category, categories, defaultValues.category),
-  marketplace: firstAllowedValue(product.marketplace, marketplaces, defaultValues.marketplace),
-  features: product.features?.length ? product.features : defaultValues.features,
-  audience: firstAllowedValue(product.targetAudience, audiences, defaultValues.audience),
-  costPrice: '0',
-  salePrice: String(product.price ?? ''),
-  targetMargin: defaultValues.targetMargin,
-  tone: firstAllowedValue(product.tone, tones, defaultValues.tone),
-  imageUri: undefined,
-  variations: product.variations ? product.variations.map(v => ({
-    id: v.id,
-    color: v.color,
-    size: v.size,
-    sku: v.sku,
-    stockQuantity: v.stockQuantity,
-    price: v.price
-  })) : [],
-});
+export const productToFormData = (product: Product): ProductAdFormData => {
+  const mlListing = product.listings?.find(
+    (l) => l.marketplace.toLowerCase().includes('mercado') || l.marketplace === 'ML'
+  );
+  const shopeeListing = product.listings?.find((l) => l.marketplace.toLowerCase().includes('shopee'));
+
+  return {
+    productName: product.name ?? '',
+    category: firstAllowedValue(product.category, categories, defaultValues.category),
+    sku: product.sku ?? '',
+    stockQuantity: product.stockQuantity ?? 0,
+    costPrice: product.costPrice !== undefined && product.costPrice !== null ? String(product.costPrice) : '',
+    targetMargin: defaultValues.targetMargin,
+    tone: firstAllowedValue(product.tone, tones, defaultValues.tone),
+    audience: firstAllowedValue(product.targetAudience, audiences, defaultValues.audience),
+    features: product.features?.length ? product.features : defaultValues.features,
+    listings: [
+      {
+        marketplace: 'Shopee',
+        price: shopeeListing ? String(shopeeListing.price) : '',
+        enabled: !!shopeeListing,
+      },
+      {
+        marketplace: 'Mercado Livre',
+        price: mlListing ? String(mlListing.price) : '',
+        enabled: !!mlListing,
+      },
+    ],
+  };
+};

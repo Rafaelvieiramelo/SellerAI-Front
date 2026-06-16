@@ -506,8 +506,14 @@ export function ProductCard({
             {product.name}
           </Text>
           <View style={styles.platformAndPrice}>
-            <Text style={styles.productPrice}>{formatPrice(product.price)}</Text>
-            <MarketplaceBadge platform={product.marketplace} />
+            <Text style={styles.productPrice}>
+              {product.listings && product.listings.length > 0
+                ? formatPrice(product.listings[0].price)
+                : formatPrice(product.costPrice)}
+            </Text>
+            {product.listings && product.listings.length > 0 ? (
+              <MarketplaceBadge platform={product.listings[0].marketplace} />
+            ) : null}
           </View>
         </View>
       </View>

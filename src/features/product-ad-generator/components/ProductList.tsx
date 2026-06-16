@@ -187,7 +187,7 @@ export function ProductList({
             }
           ]}>
             <AIButton
-              title={generatingAd ? 'Gerando...' : 'Gerar Anúncio (IA)'}
+              title={generatingAd ? 'Gerando...' : 'Gerar Descrição (IA)'}
               onPress={onGenerateAd}
               disabled={!canGenerateAd}
               loading={generatingAd}

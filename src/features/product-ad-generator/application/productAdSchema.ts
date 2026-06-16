@@ -6,25 +6,22 @@ const currencyString = z
   .min(1, 'Informe um valor')
   .refine((value) => Number.isFinite(Number(value.replace(',', '.'))), 'Use um valor válido');
 
-const variationSchema = z.object({
-  id: z.string().optional(),
-  color: z.string().trim(),
-  size: z.string().trim(),
-  sku: z.string().trim().min(2, 'Informe o SKU (mín. 2 chars)'),
-  stockQuantity: z.number().int().nonnegative('Estoque não pode ser negativo'),
-  price: z.number().nullable(),
+const listingSchema = z.object({
+  marketplace: z.string(),
+  price: z.string(),
+  enabled: z.boolean(),
 });
 
 export const productAdSchema = z.object({
   productName: z.string().trim().min(3, 'Informe ao menos 3 caracteres'),
   category: z.enum(categories),
-  marketplace: z.enum(marketplaces),
-  features: z.array(z.string().trim().min(2)).min(2, 'Adicione pelo menos 2 características'),
-  audience: z.enum(audiences),
+  sku: z.string().trim().min(2, 'Informe o SKU (mín. 2 chars)'),
+  stockQuantity: z.number().int().nonnegative('Estoque não pode ser negativo'),
   costPrice: currencyString,
-  salePrice: currencyString,
   targetMargin: currencyString,
   tone: z.enum(tones),
+  audience: z.enum(audiences),
+  features: z.array(z.string().trim().min(2)).min(2, 'Adicione pelo menos 2 características'),
   imageUri: z.string().optional(),
-  variations: z.array(variationSchema).optional(),
+  listings: z.array(listingSchema).optional(),
 });
